@@ -21,6 +21,7 @@ namespace Tetris
             InitializeComponent();
             createSquares();
             blocksetList.DataSource = BlockLoader.names();
+            showUIWhenPlaying = true;
         }
 
         #region variables
@@ -29,6 +30,8 @@ namespace Tetris
         /// Is a game currently being played?
         /// </summary>
         Boolean playing { get; set; }
+
+        bool showUIWhenPlaying;
 
         /// <summary>
         /// The board that the game is played on
@@ -73,8 +76,12 @@ namespace Tetris
             numberOfRows = (int)boardRowsSelect.Value;
             numberOfColumns = (int)boardColsSelect.Value;
             board = new Board(numberOfRows, numberOfColumns, blocksetList.Text);
-            createSquares();
-            tickTimer.Enabled = true;
+            
+            if (showUIWhenPlaying)
+            {
+                createSquares();
+                tickTimer.Enabled = true;
+            }
             playing = true;
         }
 
@@ -111,24 +118,30 @@ namespace Tetris
         /// </summary>
         private void createSquares()
         {
+            /*
             foreach (KeyValuePair<String,Square> val in squares)
             {
                 val.Value.Dispose();
             }
             squares.Clear();
+            */
 
-            for (int row = 0; row < numberOfRows; row++)
+            //This will break the program when the dimensions of the game change
+            if (squares.Count == 0)
             {
-                for (int col = 0; col < numberOfColumns; col++)
+                for (int row = 0; row < numberOfRows; row++)
                 {
-                    Square square = new Square(row, col);
-                    square.Width = squareDimensions;
-                    square.Height = squareDimensions;
-                    square.Parent = gameWindow;
-                    square.Top = row * squareDimensions;
-                    square.Left = col * squareDimensions;
+                    for (int col = 0; col < numberOfColumns; col++)
+                    {
+                        Square square = new Square(row, col);
+                        square.Width = squareDimensions;
+                        square.Height = squareDimensions;
+                        square.Parent = gameWindow;
+                        square.Top = row * squareDimensions;
+                        square.Left = col * squareDimensions;
 
-                    squares.Add(squaresKey(row, col), square);
+                        squares.Add(squaresKey(row, col), square);
+                    }
                 }
             }
         }
@@ -239,17 +252,14 @@ namespace Tetris
         private void learnButton_Click(object sender, EventArgs e)
         {
             //Just testing that we can quickly play a game
-            squareDimensions = (int)sqSizeSelect.Value;
-            numberOfRows = (int)boardRowsSelect.Value;
-            numberOfColumns = (int)boardColsSelect.Value;
-            board = new Board(numberOfRows, numberOfColumns, blocksetList.Text);
-            createSquares();
+            showUIWhenPlaying = false;
+            resetGame();
 
             Random rand = new Random();
 
             for(int i = 0; !board.topRowHasSquare(); i++) //Losing situation
             {
-                Thread.Sleep(30);
+                //Thread.Sleep(30);
                 if (rand.NextDouble() > 0.5)
                 {
                     board.moveBlockLeft();
@@ -265,14 +275,26 @@ namespace Tetris
                     board.tick();
                     //Update squares then draw bloack
                     //updateBoard();
-                    rowsCleared.Text = board.rowsDestroyed.ToString();
-                    score.Text = board.score.ToString();
+                    if (showUIWhenPlaying)
+                    {
+                        rowsCleared.Text = board.rowsDestroyed.ToString();
+                        score.Text = board.score.ToString();
+                    }
                 }
 
-                updateBoard();
+                if (showUIWhenPlaying)
+                {
+                    updateBoard();
+                    //This is a hack, in the future start a separate thread
+                    Application.DoEvents();
+                }
+            }
 
-                //This is a hack, in the future start a separate thread
-                Application.DoEvents();
+            if(!showUIWhenPlaying)
+            {
+                //We need to show the final state.
+                createSquares();
+                updateBoard();
             }
         }
     }
