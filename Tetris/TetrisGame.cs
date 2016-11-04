@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 using Tetris;
 
@@ -235,5 +236,44 @@ namespace Tetris
 
         #endregion input
 
+        private void learnButton_Click(object sender, EventArgs e)
+        {
+            //Just testing that we can quickly play a game
+            squareDimensions = (int)sqSizeSelect.Value;
+            numberOfRows = (int)boardRowsSelect.Value;
+            numberOfColumns = (int)boardColsSelect.Value;
+            board = new Board(numberOfRows, numberOfColumns, blocksetList.Text);
+            createSquares();
+
+            Random rand = new Random();
+
+            for(int i = 0; !board.topRowHasSquare(); i++) //Losing situation
+            {
+                Thread.Sleep(30);
+                if (rand.NextDouble() > 0.5)
+                {
+                    board.moveBlockLeft();
+                }
+                else
+                {
+                    board.moveBlockRight();
+                }
+
+                if (i % 5 == 4)
+                {
+                    //Moves block down, adds new block if necessary, removes any filled rows, updates score
+                    board.tick();
+                    //Update squares then draw bloack
+                    //updateBoard();
+                    rowsCleared.Text = board.rowsDestroyed.ToString();
+                    score.Text = board.score.ToString();
+                }
+
+                updateBoard();
+
+                //This is a hack, in the future start a separate thread
+                Application.DoEvents();
+            }
+        }
     }
 }

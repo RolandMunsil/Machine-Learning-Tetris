@@ -234,6 +234,19 @@ namespace Tetris
             rowsDestroyed++;
         }
 
+        public bool topRowHasSquare()
+        {
+            int row = numberOfRows - 1;
+            for(int col = 0; col < numberOfColumns; col++)
+            {
+                if(board[col, row] != boardColor)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         #endregion gameEvents
 
         #region blockMovement
