@@ -369,9 +369,7 @@
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "TetrisGame";
             this.Text = "Tetris";
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TetrisGame_KeyDown);
             this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TetrisGame_KeyPress);
-            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.TetrisGame_KeyUp);
             this.tableLayout.ResumeLayout(false);
             this.tableLayout.PerformLayout();
             this.menuStrip.ResumeLayout(false);

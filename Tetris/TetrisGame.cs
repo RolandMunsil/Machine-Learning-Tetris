@@ -14,23 +14,13 @@ namespace Tetris
     public partial class TetrisGame : Form
     {
         /// <summary>
-        /// A game of Tetris implemented as a WinForms application
-        /// </summary>
-        public TetrisGame()
-        {
-            InitializeComponent();
-            createSquares();
-            blocksetList.DataSource = BlockLoader.names();
-            showUIWhenPlaying = true;
-        }
-
-        #region variables
-
-        /// <summary>
         /// Is a game currently being played?
         /// </summary>
-        Boolean playing { get; set; }
+        bool playing;
 
+        /// <summary>
+        /// Whether to update the UI when the board state changes
+        /// </summary>
         bool showUIWhenPlaying;
 
         /// <summary>
@@ -56,49 +46,53 @@ namespace Tetris
         /// <summary>
         /// The squares that are visible on the board
         /// </summary>
-        Dictionary<string, Square> squares = new Dictionary<string,Square>();
+        Dictionary<string, Square> squares = new Dictionary<string, Square>();
 
         /// <summary>
-        /// The keybord input for the game
+        /// A game of Tetris implemented as a WinForms application
         /// </summary>
-        Input input = new Input();
-
-        #endregion variables
+        public TetrisGame()
+        {
+            InitializeComponent();
+            CreateSquares();
+            blocksetList.DataSource = BlockLoader.names();
+            showUIWhenPlaying = true;
+        }      
 
         #region game
 
         /// <summary>
         /// Resets the game
         /// </summary>
-        private void resetGame()
+        private void ResetGame()
         {
-            squareDimensions = (int)sqSizeSelect.Value;
-            numberOfRows = (int)boardRowsSelect.Value;
-            numberOfColumns = (int)boardColsSelect.Value;
+            bool boardPropertiesChanged = squareDimensions != (int)sqSizeSelect.Value ||
+                                              numberOfRows != (int)boardRowsSelect.Value ||
+                                           numberOfColumns != (int)boardColsSelect.Value;
+            if (boardPropertiesChanged)
+            {
+                squareDimensions = (int)sqSizeSelect.Value;
+                numberOfRows = (int)boardRowsSelect.Value;
+                numberOfColumns = (int)boardColsSelect.Value;
+                if (showUIWhenPlaying)
+                    CreateSquares();
+            }
             board = new Board(numberOfRows, numberOfColumns, blocksetList.Text);
             
             if (showUIWhenPlaying)
-            {
-                createSquares();
                 tickTimer.Enabled = true;
-            }
             playing = true;
         }
 
         /// <summary>
-        /// Update the game at the interval that is specified
+        /// Moves the current block down and 
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void tickTimer_Tick(object sender, EventArgs e)
         {
-            if (playing)
-            {
-                board.tick();
-                updateBoard();
-                rowsCleared.Text = board.rowsDestroyed.ToString();
-                score.Text = board.score.ToString();
-            }
+            board.tick();
+            UpdateBoard();
+            rowsCleared.Text = board.rowsDestroyed.ToString();
+            score.Text = board.score.ToString();
         }
 
         #endregion game
@@ -108,7 +102,7 @@ namespace Tetris
         /// <summary>
         /// Calculates a string to use as the key for the squares hash
         /// </summary>
-        private String squaresKey(int row, int col)
+        private String SquaresKey(int row, int col)
         {
             return "R" + row.ToString() + "C" + col.ToString();
         }
@@ -116,32 +110,26 @@ namespace Tetris
         /// <summary>
         /// Creates the squares which make up the visible portion of the board
         /// </summary>
-        private void createSquares()
+        private void CreateSquares()
         {
-            /*
             foreach (KeyValuePair<String,Square> val in squares)
             {
                 val.Value.Dispose();
             }
             squares.Clear();
-            */
 
-            //This will break the program when the dimensions of the game change
-            if (squares.Count == 0)
+            for (int row = 0; row < numberOfRows; row++)
             {
-                for (int row = 0; row < numberOfRows; row++)
+                for (int col = 0; col < numberOfColumns; col++)
                 {
-                    for (int col = 0; col < numberOfColumns; col++)
-                    {
-                        Square square = new Square(row, col);
-                        square.Width = squareDimensions;
-                        square.Height = squareDimensions;
-                        square.Parent = gameWindow;
-                        square.Top = row * squareDimensions;
-                        square.Left = col * squareDimensions;
+                    Square square = new Square(row, col);
+                    square.Width = squareDimensions;
+                    square.Height = squareDimensions;
+                    square.Parent = gameWindow;
+                    square.Top = row * squareDimensions;
+                    square.Left = col * squareDimensions;
 
-                        squares.Add(squaresKey(row, col), square);
-                    }
+                    squares.Add(SquaresKey(row, col), square);
                 }
             }
         }
@@ -149,7 +137,7 @@ namespace Tetris
         /// <summary>
         /// Updates the game board, displaying where the squares are on the grid
         /// </summary>
-        private void updateBoard()
+        private void UpdateBoard()
         {
             // update the color of each of the squares on the board
             Square square;
@@ -157,7 +145,7 @@ namespace Tetris
             {
                 for (int col = 0; col < numberOfColumns; col++)
                 {
-                    squares.TryGetValue(squaresKey(row, col), out square);
+                    squares.TryGetValue(SquaresKey(row, col), out square);
                     square.color = board.board[col, row + board.hiddenRows];
                 }
             }
@@ -173,7 +161,7 @@ namespace Tetris
                     if (block.squares[row, col] && coord.x >= 0 && coord.x < numberOfColumns
                             && coord.y >= board.hiddenRows && coord.y < numberOfRows + board.hiddenRows)
                     {
-                        squares.TryGetValue(squaresKey(coord.y - board.hiddenRows, coord.x), out square);
+                        squares.TryGetValue(SquaresKey(coord.y - board.hiddenRows, coord.x), out square);
                         square.color = block.color.ToArgb();
                     }
                 }
@@ -182,78 +170,48 @@ namespace Tetris
 
         #endregion GUI
 
-        #region input
-
+        #region Input
         /// <summary>
         /// Create a new game when the 'New Game' button is clicked
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void newGameButton_Click(object sender, EventArgs e)
         {
-            resetGame();
+            ResetGame();
         }
 
         /// <summary>
         /// Listen for input from the keyboard and respond accordingly
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void TetrisGame_KeyPress(object sender, KeyPressEventArgs e)
         {
             textBox1.Text = e.KeyChar.ToString();
             if (playing)
             {
-                if (input.downKeyPressed)
+                switch(e.KeyChar)
                 {
-                    board.lowerBlock();
+                    case 's':
+                        board.lowerBlock();
+                        break;
+                    case 'a':
+                        board.moveBlockLeft();
+                        break;
+                    case 'd':
+                        board.moveBlockRight();
+                        break;
+                    case 'w':
+                        board.rotateBlock();
+                        break;
                 }
-                if (input.leftKeyPressed)
-                {
-                    board.moveBlockLeft();
-                }
-                if (input.rightKeyPressed)
-                {
-                    board.moveBlockRight();
-                }
-                if (input.rotateKeyPressed)
-                {
-                    board.rotateBlock();
-                }
-                updateBoard();
+                UpdateBoard();
             }
         }
-
-        /// <summary>
-        /// When a key is pressed, let the input controller process the action
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void TetrisGame_KeyDown(object sender, KeyEventArgs e)
-        {
-            textBox2.Text = e.KeyValue.ToString() + " " + e.KeyCode.ToString();
-            char key = e.KeyCode.ToString().ToLower()[0];
-            input.processKey(key, true);
-        }
-
-        /// <summary>
-        /// When a key is raised, let the input controller process the action
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void TetrisGame_KeyUp(object sender, KeyEventArgs e)
-        {
-            char key = e.KeyCode.ToString().ToLower()[0];
-            input.processKey(key, false);
-        }
-
-        #endregion input
+        #endregion
 
         private void learnButton_Click(object sender, EventArgs e)
         {
             //Just testing that we can quickly play a game
             showUIWhenPlaying = false;
-            resetGame();
+            ResetGame();
 
             Random rand = new Random();
 
@@ -284,17 +242,18 @@ namespace Tetris
 
                 if (showUIWhenPlaying)
                 {
-                    updateBoard();
+                    UpdateBoard();
                     //This is a hack, in the future start a separate thread
                     Application.DoEvents();
                 }
             }
+            tickTimer.Enabled = false;
 
-            if(!showUIWhenPlaying)
+            if (!showUIWhenPlaying)
             {
                 //We need to show the final state.
-                createSquares();
-                updateBoard();
+                CreateSquares();
+                UpdateBoard();
             }
         }
     }
