@@ -6,19 +6,20 @@ using System.Drawing;
 
 namespace Tetris
 {
+    [System.Diagnostics.DebuggerDisplay("{color.Name}")]
     /// <summary>
-    /// Specifies a possible start position for a block
+    /// Specifies a type of block (i.e. a shape and color)
     /// </summary>
-    class BlockStartPosition
+    class BlockType
     {
         /// <summary>
-        /// The start position of the block
+        /// The shape of the block
         /// </summary>
-        public Boolean[,] position { get; set; }
+        public Boolean[,] shape;
 
         /// <summary>
         /// The color of the block - regulations specify that different shapes are different colors
         /// </summary>
-        public Color color { get; set; }
+        public Color color;
     }
 }

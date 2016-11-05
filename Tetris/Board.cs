@@ -31,7 +31,7 @@ namespace Tetris
             numberOfRows = noOfRows;
             numberOfRowsTotal = noOfRows + hiddenRows;
 
-            tick(); // stop a crash when holding a key down when starting a game
+            Tick(); // stop a crash when holding a key down when starting a game
         }
 
         #region variables
@@ -92,14 +92,14 @@ namespace Tetris
         /// <summary>
         /// Ticks the board forward one move
         /// </summary>
-        public void tick()
+        public void Tick()
         {
-            if (currentBlock == null || !canDropFurther())
+            if (currentBlock == null || !CanLowerBlock())
             {
-                spawnBlock();
+                SpawnBlock();
             }
 
-            lowerBlock();
+            TryLowerBlock();
             manageFullRows();
         }
 
@@ -108,7 +108,7 @@ namespace Tetris
         /// <summary>
         /// Creates a new block to play with
         /// </summary>
-        private void spawnBlock()
+        private void SpawnBlock()
         {
             // lock the previous block into position
             lockBlock();
@@ -237,9 +237,9 @@ namespace Tetris
         public bool topRowHasSquare()
         {
             int row = numberOfRows - 1;
-            for(int col = 0; col < numberOfColumns; col++)
+            for (int col = 0; col < numberOfColumns; col++)
             {
-                if(board[col, row] != boardColor)
+                if (board[col, row] != boardColor)
                 {
                     return true;
                 }
@@ -249,44 +249,64 @@ namespace Tetris
 
         #endregion gameEvents
 
-        #region blockMovement
-
+        #region Block Movement
         /// <summary>
-        /// Rotates the block 90 degrees clockwise
+        /// Rotates the block 90 degrees clockwise if possible
         /// </summary>
-        public void rotateBlock()
+        public void TryRotateBlock()
         {
-            if (canRotate())
-                currentBlock.rotateClockwise();
+            Block rotated = currentBlock.RotatedClockwise();
+            if (canBeHere(rotated))
+            {
+                currentBlock = rotated;
+            }
         }
 
         /// <summary>
-        /// Lowers the current block down one row
+        /// Lowers the current block down one row if possible
         /// </summary>
-        public void lowerBlock()
+        /// <returns>Whether the block could be lowered</returns>
+        public bool TryLowerBlock()
         {
-            if (canDropFurther())
-                currentBlock.y++;
+            currentBlock.y++;
+
+            if (!canBeHere(currentBlock))
+            {
+                currentBlock.y--;
+                return false;
+            }
+            return true;
+        }
+
+        public bool CanLowerBlock()
+        {
+            currentBlock.y++;
+            bool worked = canBeHere(currentBlock);
+            currentBlock.y--;
+            return worked;
         }
 
         /// <summary>
-        /// Moves the block left one column
+        /// Moves the block left one column if possible
         /// </summary>
-        public void moveBlockLeft()
+        public void TryMoveBlockLeft()
         {
-            if (canMoveToSide(false))
-                currentBlock.x--;
-        }
+            currentBlock.x--;
 
-        /// <summary>
-        /// Moves the block right one column
-        /// </summary>
-        public void moveBlockRight()
-        {
-            if (canMoveToSide(true))
+            if (!canBeHere(currentBlock))
                 currentBlock.x++;
         }
 
+        /// <summary>
+        /// Moves the block right one column if possible
+        /// </summary>
+        public void TryMoveBlockRight()
+        {
+            currentBlock.x++;
+
+            if (!canBeHere(currentBlock))
+                currentBlock.x--;
+        }
         #endregion blockMovement
 
         #region blockPositionChecks
@@ -344,64 +364,5 @@ namespace Tetris
         #endregion blockPositionChecks
 
         #endregion board
-
-        #region block
-
-        /// <summary>
-        /// Checks to see whether the block is able to rotate clockwise
-        /// </summary>
-        /// <returns>Indicates whether the block is able to rotate clockwise</returns>
-        private Boolean canRotate()
-        {
-            Boolean canRotate = true;
-
-            Block whenRotated = currentBlock.Clone();
-            whenRotated.rotateClockwise();
-
-            if (!canBeHere(whenRotated))
-                canRotate = false;
-
-            return canRotate;
-        }
-
-        /// <summary>
-        /// Checks to see whether the block can drop any futher
-        /// </summary>
-        /// <returns>Indicates whether the current block can drop any further</returns>
-        private Boolean canDropFurther()
-        {
-            Boolean canDrop = true;
-
-            Block whenDropped = currentBlock.Clone();
-            whenDropped.y++;
-
-            if (!canBeHere(whenDropped))
-                canDrop = false;
-
-            return canDrop;
-        }
-
-        /// <summary>
-        /// Checks to see whether there's something in the way to one side of the block
-        /// </summary>
-        /// <param name="toRight">Represents the direction to check in. true = Right, false = Left</param>
-        /// <returns>Indicates whether the current block would be free to move to the specified side</returns>
-        private Boolean canMoveToSide(Boolean toRight)
-        {
-            Boolean canMove = true;
-
-            Block whenMoved = currentBlock.Clone();
-            if (toRight)
-                whenMoved.x++;
-            else
-                whenMoved.x--;
-
-            if (!canBeHere(whenMoved))
-                canMove = false;
-
-            return canMove;
-        }
-
-        #endregion block
     }
 }

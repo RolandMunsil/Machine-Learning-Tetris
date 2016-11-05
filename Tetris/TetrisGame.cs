@@ -89,7 +89,7 @@ namespace Tetris
         /// </summary>
         private void tickTimer_Tick(object sender, EventArgs e)
         {
-            board.tick();
+            board.Tick();
             UpdateBoard();
             rowsCleared.Text = board.rowsDestroyed.ToString();
             score.Text = board.score.ToString();
@@ -112,9 +112,9 @@ namespace Tetris
         /// </summary>
         private void CreateSquares()
         {
-            foreach (KeyValuePair<String,Square> val in squares)
+            foreach (Square square in squares.Values)
             {
-                val.Value.Dispose();
+                square.Dispose();
             }
             squares.Clear();
 
@@ -190,16 +190,16 @@ namespace Tetris
                 switch(e.KeyChar)
                 {
                     case 's':
-                        board.lowerBlock();
+                        board.TryLowerBlock();
                         break;
                     case 'a':
-                        board.moveBlockLeft();
+                        board.TryMoveBlockLeft();
                         break;
                     case 'd':
-                        board.moveBlockRight();
+                        board.TryMoveBlockRight();
                         break;
                     case 'w':
-                        board.rotateBlock();
+                        board.TryRotateBlock();
                         break;
                 }
                 UpdateBoard();
@@ -220,17 +220,17 @@ namespace Tetris
                 //Thread.Sleep(30);
                 if (rand.NextDouble() > 0.5)
                 {
-                    board.moveBlockLeft();
+                    board.TryMoveBlockLeft();
                 }
                 else
                 {
-                    board.moveBlockRight();
+                    board.TryMoveBlockRight();
                 }
 
                 if (i % 5 == 4)
                 {
                     //Moves block down, adds new block if necessary, removes any filled rows, updates score
-                    board.tick();
+                    board.Tick();
                     //Update squares then draw bloack
                     //updateBoard();
                     if (showUIWhenPlaying)

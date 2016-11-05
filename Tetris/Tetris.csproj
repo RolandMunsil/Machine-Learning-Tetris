@@ -62,13 +62,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BlockLoader.cs" />
-    <Compile Include="BlockPositionSpawner.cs" />
     <Compile Include="BlockSpawner.cs" />
-    <Compile Include="BlockStartPosition.cs" />
+    <Compile Include="BlockType.cs" />
     <Compile Include="Block.cs" />
     <Compile Include="Board.cs" />
     <Compile Include="Coordinate.cs" />
-    <Compile Include="PossibleBlockStartPositions.cs" />
     <Compile Include="Square.cs">
       <SubType>UserControl</SubType>
     </Compile>

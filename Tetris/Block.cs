@@ -12,28 +12,9 @@ namespace Tetris
     class Block
     {
         /// <summary>
-        /// A block (tetromino) that falls down the grid
-        /// </summary>
-        /// <param name="positionSpawner">The position spawner to determine which block it should be</param>
-        public Block(BlockPositionSpawner positionSpawner)
-        {
-            // decide which block it is
-            Random random = new Random();
-            BlockStartPosition startPos = positionSpawner.Next();
-            squares = startPos.position;
-            color = startPos.color;
-
-            // set the initial position
-            x = 3;
-            y = 0;
-        }
-
-        #region variables
-
-        /// <summary>
         /// The color of the block
         /// </summary>
-        public Color color { get; set; }
+        public Color color;
 
         /// <summary>
         /// The position of squares and blanks within the block.
@@ -46,25 +27,36 @@ namespace Tetris
         /// <summary>
         /// The x coordinate of the block
         /// </summary>
-        public int x { get; set; }
+        public int x;
 
         /// <summary>
         /// The y coordinate of the block
         /// </summary>
-        public int y { get; set; }
-
-        #endregion variables
-
-        #region utility
+        public int y;
 
         /// <summary>
-        /// Clones the current block
+        /// A block (tetromino) that falls down the grid
         /// </summary>
-        /// <returns>A clone of the current block</returns>
-        public Block Clone()
+        /// <param name="positionSpawner">The type of the block</param>
+        public Block(BlockType blockType)
         {
-            return (Block)this.MemberwiseClone();
+            squares = blockType.shape;
+            color = blockType.color;
         }
+
+        /// <summary>
+        /// Used to clone a block. Doesn't copy <code>squares</code>.
+        /// </summary>
+        /// <param name="original"></param>
+        private Block(Block original)
+        {
+            //this.squares = (bool[,])original.squares.Clone();
+            this.color = original.color;
+            this.x = original.x;
+            this.y = original.y;
+        }
+
+        #region utility
 
         /// <summary>
         /// Converts the coordinates of a square within the block to board-coodinate space
@@ -100,27 +92,27 @@ namespace Tetris
         /// <summary>
         /// Rotates the block clockwise
         /// </summary>
-        public void rotateClockwise()
+        public Block RotatedClockwise()
         {
-            rotateAntiClockwise();
-            rotateAntiClockwise();
-            rotateAntiClockwise();
+            return RotatedAntiClockwise().RotatedAntiClockwise().RotatedAntiClockwise();
         }
 
         /// <summary>
         /// Rotates the block anti-clockwise by rotating it clockwise three times
         /// </summary>
-        public void rotateAntiClockwise()
+        public Block RotatedAntiClockwise()
         {
+            Block copy = new Block(this);
+
             // would be quicker to use matrices, but thinking is hard ;P
-            Boolean[,] temp = new Boolean[squares.GetLength(0), squares.GetLength(1)];
+            copy.squares = new Boolean[squares.GetLength(0), squares.GetLength(1)];
 
             // works for squares of size 4x4, so hopefully also works for bigger ones
             for (int col = 0; col < squares.GetLength(0); col++)
                 for (int row = 0; row < squares.GetLength(1); row++)
-                    temp[squares.GetLength(1) - 1 - row, col] = squares[col, row];
+                    copy.squares[squares.GetLength(1) - 1 - row, col] = squares[col, row];
 
-            squares = temp;
+            return copy;
         }
 
         #endregion movement
