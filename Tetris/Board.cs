@@ -86,6 +86,8 @@ namespace Tetris
         /// </summary>
         int totalNumRows;
 
+        public bool hasLost = false;
+
         #endregion variables
 
         /// <summary>
@@ -96,11 +98,18 @@ namespace Tetris
             if (!CanLowerBlock())
             {
                 LockBlock();
+                DestroyFullRows();
                 SpawnBlock();
+                if(!CanBeHere(currentBlock))
+                {
+                    hasLost = true;
+                }
             }
-
-            TryLowerBlock();
-            DestroyFullRows();
+            else
+            {
+                TryLowerBlock();
+            }
+            
         }
 
         #region board
@@ -112,8 +121,8 @@ namespace Tetris
         {
             // spawn a new block
             currentBlock = blockSpawner.Next();
-            currentBlock.row = numHiddenRows - 2;
-            currentBlock.col = (numColumns - currentBlock.squares.GetLength(1)) / 2;
+            currentBlock.topLeft.row = numHiddenRows - 2;
+            currentBlock.topLeft.col = (numColumns - currentBlock.squares.GetLength(1)) / 2;
         }
 
         /// <summary>
@@ -193,19 +202,6 @@ namespace Tetris
             rowsDestroyed++;
         }
 
-        public bool TopRowHasSquare()
-        {
-            int row = numVisibleRows - 1;
-            for (int col = 0; col < numColumns; col++)
-            {
-                if (board[row, col] != boardColor)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
         #endregion gameEvents
 
         #region Block Movement
@@ -227,17 +223,17 @@ namespace Tetris
         /// <returns>Whether the block could be lowered</returns>
         public void TryLowerBlock()
         {
-            currentBlock.row++;
+            currentBlock.topLeft.row++;
 
             if (!CanBeHere(currentBlock))
-                currentBlock.row--;
+                currentBlock.topLeft.row--;
         }
 
         public bool CanLowerBlock()
         {
-            currentBlock.row++;
+            currentBlock.topLeft.row++;
             bool worked = CanBeHere(currentBlock);
-            currentBlock.row--;
+            currentBlock.topLeft.row--;
             return worked;
         }
 
@@ -246,10 +242,10 @@ namespace Tetris
         /// </summary>
         public void TryMoveBlockLeft()
         {
-            currentBlock.col--;
+            currentBlock.topLeft.col--;
 
             if (!CanBeHere(currentBlock))
-                currentBlock.col++;
+                currentBlock.topLeft.col++;
         }
 
         /// <summary>
@@ -257,10 +253,10 @@ namespace Tetris
         /// </summary>
         public void TryMoveBlockRight()
         {
-            currentBlock.col++;
+            currentBlock.topLeft.col++;
 
             if (!CanBeHere(currentBlock))
-                currentBlock.col--;
+                currentBlock.topLeft.col--;
         }
         #endregion blockMovement
 

@@ -207,7 +207,7 @@ namespace Tetris
 
             Random rand = new Random();
 
-            for(int i = 0; !board.TopRowHasSquare(); i++) //Losing situation
+            for(int i = 0; !board.hasLost; i++) //Losing situation
             {
                 //Thread.Sleep(30);
                 if (rand.NextDouble() > 0.5)
@@ -244,8 +244,10 @@ namespace Tetris
             if (!showUIWhenPlaying)
             {
                 //We need to show the final state.
-                CreateSquares();
+                //CreateSquares();
                 UpdateBoard();
+                rowsCleared.Text = board.rowsDestroyed.ToString();
+                score.Text = board.score.ToString();
             }
         }
     }

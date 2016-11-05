@@ -24,15 +24,7 @@ namespace Tetris
         /// </summary>
         public Boolean[,] squares;
 
-        /// <summary>
-        /// The x coordinate of the block
-        /// </summary>
-        public int col;
-
-        /// <summary>
-        /// The y coordinate of the block
-        /// </summary>
-        public int row;
+        public Coordinate topLeft;
 
         /// <summary>
         /// A block (tetromino) that falls down the grid
@@ -42,6 +34,7 @@ namespace Tetris
         {
             squares = blockType.shape;
             color = blockType.color;
+            topLeft = new Coordinate(-1, -1);
         }
 
         /// <summary>
@@ -52,8 +45,8 @@ namespace Tetris
         {
             //this.squares = (bool[,])original.squares.Clone();
             this.color = original.color;
-            this.col = original.col;
-            this.row = original.row;
+            this.topLeft.col = original.topLeft.col;
+            this.topLeft.row = original.topLeft.row;
         }
 
         /// <summary>
@@ -62,8 +55,8 @@ namespace Tetris
         /// <returns></returns>
         public Coordinate toBoardCoordinates(Coordinate coord)
         {
-            coord.col += col;
-            coord.row += row;
+            coord.col += topLeft.col;
+            coord.row += topLeft.row;
 
             return coord;
         }
