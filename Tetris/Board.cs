@@ -18,18 +18,17 @@ namespace Tetris
         /// <param name="noOfColumns">The number of columns on the board</param>
         public Board(int noOfRows, int noOfColumns, String blockSet)
         {
-            board = new int[noOfColumns, noOfRows + numHiddenRows];
-            blockSpawner = new BlockSpawner(blockSet);
-
-            // initialise the board by setting each cell as the default color
-            for (int col = 0; col < noOfColumns; col++)
-                for (int row = 0; row < noOfRows + numHiddenRows; row++)
-                    board[col, row] = boardColor;
-
-            // initialise variables based on the parameters
             numColumns = noOfColumns;
             numVisibleRows = noOfRows;
             totalNumRows = noOfRows + numHiddenRows;
+
+            board = new int[totalNumRows, numColumns];
+            blockSpawner = new BlockSpawner(blockSet);
+
+            // initialise the board by setting each cell as the default color
+            for (int row = 0; row < totalNumRows; row++)
+                for (int col = 0; col < numColumns; col++)
+                    board[row, col] = boardColor;
 
             SpawnBlock();
         }
@@ -58,7 +57,7 @@ namespace Tetris
 
         /// <summary>
         /// The board that is being played on.
-        /// board[col, row]. (0, 0) is the upper left.
+        /// board[row, col]. (0, 0) is the upper left.
         /// </summary>
         public int[,] board;
 
@@ -113,8 +112,8 @@ namespace Tetris
         {
             // spawn a new block
             currentBlock = blockSpawner.Next();
-            currentBlock.y = numHiddenRows - 2;
-            currentBlock.x = (numColumns - currentBlock.squares.GetLength(1)) / 2;
+            currentBlock.row = numHiddenRows - 2;
+            currentBlock.col = (numColumns - currentBlock.squares.GetLength(1)) / 2;
         }
 
         /// <summary>
@@ -130,9 +129,9 @@ namespace Tetris
                     // if there's something there
                     if (currentBlock.squares[row, col])
                     {
-                        Coordinate coord = currentBlock.toBoardCoordinates(new Coordinate(col, row));
+                        Coordinate coord = currentBlock.toBoardCoordinates(new Coordinate(row, col));
                         // lock it into position on the board
-                        board[coord.x, coord.y] = currentBlock.color.ToArgb();
+                        board[coord.row, coord.col] = currentBlock.color.ToArgb();
                     }
                 }
             }
@@ -165,7 +164,7 @@ namespace Tetris
         private Boolean RowIsFull(int row)
         {
             for (int col = 0; col < numColumns; col++)
-                if (board[col, row] == boardColor)
+                if (board[row, col] == boardColor)
                     return false;
 
             return true;
@@ -187,7 +186,7 @@ namespace Tetris
                 for (int col = 0; col < numColumns; col++)
                 {
                     // and overwriting the current position with the one above
-                    board[col, row] = board[col, row - 1];
+                    board[row, col] = board[row - 1, col];
                 }
             }
 
@@ -199,7 +198,7 @@ namespace Tetris
             int row = numVisibleRows - 1;
             for (int col = 0; col < numColumns; col++)
             {
-                if (board[col, row] != boardColor)
+                if (board[row, col] != boardColor)
                 {
                     return true;
                 }
@@ -228,17 +227,17 @@ namespace Tetris
         /// <returns>Whether the block could be lowered</returns>
         public void TryLowerBlock()
         {
-            currentBlock.y++;
+            currentBlock.row++;
 
             if (!CanBeHere(currentBlock))
-                currentBlock.y--;
+                currentBlock.row--;
         }
 
         public bool CanLowerBlock()
         {
-            currentBlock.y++;
+            currentBlock.row++;
             bool worked = CanBeHere(currentBlock);
-            currentBlock.y--;
+            currentBlock.row--;
             return worked;
         }
 
@@ -247,10 +246,10 @@ namespace Tetris
         /// </summary>
         public void TryMoveBlockLeft()
         {
-            currentBlock.x--;
+            currentBlock.col--;
 
             if (!CanBeHere(currentBlock))
-                currentBlock.x++;
+                currentBlock.col++;
         }
 
         /// <summary>
@@ -258,10 +257,10 @@ namespace Tetris
         /// </summary>
         public void TryMoveBlockRight()
         {
-            currentBlock.x++;
+            currentBlock.col++;
 
             if (!CanBeHere(currentBlock))
-                currentBlock.x--;
+                currentBlock.col--;
         }
         #endregion blockMovement
 
@@ -281,10 +280,10 @@ namespace Tetris
                     if (block.squares[row, col])
                     {
                         // check to see if there's something already here
-                        Coordinate coord = block.toBoardCoordinates(new Coordinate(col, row));
+                        Coordinate coord = block.toBoardCoordinates(new Coordinate(row, col));
 
-                        if (coord.x >= numColumns || coord.x < 0 || 
-                            coord.y >= totalNumRows || board[coord.x, coord.y] != boardColor)
+                        if (coord.col >= numColumns || coord.col < 0 || 
+                            coord.row >= totalNumRows || board[coord.row, coord.col] != boardColor)
                         {
                             return false;
                         }

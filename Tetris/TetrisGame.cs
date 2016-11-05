@@ -146,7 +146,7 @@ namespace Tetris
                 for (int col = 0; col < numberOfColumns; col++)
                 {
                     squares.TryGetValue(SquaresKey(row, col), out square);
-                    square.color = board.board[col, row + board.numHiddenRows];
+                    square.color = board.board[row + board.numHiddenRows, col];
                 }
             }
 
@@ -156,12 +156,12 @@ namespace Tetris
             {
                 for (int col = 0; col < block.squares.GetLength(1); col++)
                 {
-                    Coordinate coord = new Coordinate(col, row);
+                    Coordinate coord = new Coordinate(row, col);
                     coord = block.toBoardCoordinates(coord);
-                    if (block.squares[row, col] && coord.x >= 0 && coord.x < numberOfColumns
-                            && coord.y >= board.numHiddenRows && coord.y < numberOfRows + board.numHiddenRows)
+                    if (block.squares[row, col] && coord.col >= 0 && coord.col < numberOfColumns
+                            && coord.row >= board.numHiddenRows && coord.row < numberOfRows + board.numHiddenRows)
                     {
-                        squares.TryGetValue(SquaresKey(coord.y - board.numHiddenRows, coord.x), out square);
+                        squares.TryGetValue(SquaresKey(coord.row - board.numHiddenRows, coord.col), out square);
                         square.color = block.color.ToArgb();
                     }
                 }

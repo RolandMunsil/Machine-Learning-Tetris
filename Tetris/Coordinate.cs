@@ -6,29 +6,20 @@ using System.Text;
 namespace Tetris
 {
     /// <summary>
-    /// A coordinate in the form (x, y)
+    /// A coordinate in the form (row, col)
     /// </summary>
     class Coordinate
     {
+        public int row;
+        public int col;
+
         /// <summary>
-        /// Create a new coordinate in the form (x, y)
+        /// Create a new coordinate in the form (row, col)
         /// </summary>
-        /// <param name="x">The x-coordinate</param>
-        /// <param name="y">The y-coordinate</param>
-        public Coordinate(int x, int y)
+        public Coordinate(int row, int col)
         {
-            this.x = x;
-            this.y = y;
+            this.row = row;
+            this.col = col;
         }
-
-        /// <summary>
-        /// The x-coordinate
-        /// </summary>
-        public int x { get; set; }
-
-        /// <summary>
-        /// The y-coordinate
-        /// </summary>
-        public int y { get; set; }
     }
 }
