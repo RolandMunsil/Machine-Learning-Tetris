@@ -111,7 +111,7 @@ namespace Tetris
         private void SpawnBlock()
         {
             // lock the previous block into position
-            lockBlock();
+            LockBlock();
 
             // spawn a new block
             currentBlock = blockSpawner.Next();
@@ -122,12 +122,10 @@ namespace Tetris
         /// <summary>
         /// Locks the current block into position on the board
         /// </summary>
-        private void lockBlock()
+        private void LockBlock()
         {
             if (currentBlock != null)
             {
-                Coordinate coord = null;
-
                 // loop through each of the squares within the current block
                 for (int col = 0; col < currentBlock.squares.GetLength(0); col++)
                 {
@@ -136,33 +134,10 @@ namespace Tetris
                         // if there's something there
                         if (currentBlock.squares[row, col])
                         {
-                            coord = currentBlock.toBoardCoordinates(new Coordinate(col, row));
+                            Coordinate coord = currentBlock.toBoardCoordinates(new Coordinate(col, row));
                             // lock it into position on the board
                             board[coord.x, coord.y] = currentBlock.color.ToArgb();
                         }
-                    }
-                }
-
-                // single cell things fill in the row they're on
-                if (currentBlock.isSingleCell() && coord != null)
-                {
-                    List<int> filledPositions = new List<int>();
-
-                    // find where there are filled squares in the row, but not where the little one landed
-                    for (int col = 0; col < numberOfColumns; col++)
-                        if (board[col, coord.y] != boardColor)
-                            filledPositions.Add(col);
-
-                    // do another pass through and fill in the squares next to where there are empty spots
-                    for (int col = 0; col < numberOfColumns; col++)
-                    {
-                        // fill to the left
-                        if (filledPositions.Contains(col) && col - 1 >= 0 && board[col - 1, coord.y] == boardColor)
-                            board[col - 1, coord.y] = currentBlock.color.ToArgb();
-
-                        // fill to the right
-                        if (filledPositions.Contains(col) && col + 1 < numberOfColumns && board[col + 1, coord.y] == boardColor)
-                            board[col + 1, coord.y] = currentBlock.color.ToArgb();
                     }
                 }
             }

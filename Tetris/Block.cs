@@ -56,8 +56,6 @@ namespace Tetris
             this.y = original.y;
         }
 
-        #region utility
-
         /// <summary>
         /// Converts the coordinates of a square within the block to board-coodinate space
         /// </summary>
@@ -71,26 +69,7 @@ namespace Tetris
         }
 
         /// <summary>
-        /// Determines whether the block has a single solid cell
-        /// </summary>
-        public bool isSingleCell()
-        {
-            int count = 0;
-
-            for (int col = 0; col < squares.GetLength(0); col++)
-                for (int row = 0; row < squares.GetLength(1); row++)
-                    if (squares[col, row])
-                        count++;
-
-            return count == 1;
-        }
-
-        #endregion utility
-
-        #region movement
-
-        /// <summary>
-        /// Rotates the block clockwise
+        /// Returns the block rotated clockwise
         /// </summary>
         public Block RotatedClockwise()
         {
@@ -98,7 +77,7 @@ namespace Tetris
         }
 
         /// <summary>
-        /// Rotates the block anti-clockwise by rotating it clockwise three times
+        /// Returns the block rotated anti-clockwise
         /// </summary>
         public Block RotatedAntiClockwise()
         {
@@ -114,76 +93,5 @@ namespace Tetris
 
             return copy;
         }
-
-        #endregion movement
-
-        #region positionChecks
-
-        /// <summary>
-        /// Finds the columns with the lowest squares in
-        /// </summary>
-        /// <returns>A list of integers containing the columns with the lowest squares in</returns>
-        public List<int> columnsWithLowestSquaresIn()
-        {
-            List<int> lowestColumns = new List<int>();
-            int lowestRow = lowestRowWithSquareIn();
-
-            for (int col = 0; col < squares.GetLength(0); col++)
-                if (squares[col, lowestRow])
-                    lowestColumns.Add(col);
-
-            return lowestColumns;
-        }
-
-        /// <summary>
-        /// Finds the lowest row with a square in
-        /// </summary>
-        /// <returns>The lowest row with a square in</returns>
-        public int lowestRowWithSquareIn()
-        {
-            int lowestRow = 0;
-
-            for (int col = 0; col < squares.GetLength(0); col++)
-                for (int row = 0; row < squares.GetLength(1); row++)
-                    if (squares[row, col])
-                        lowestRow = row;
-
-            return lowestRow;
-        }
-
-        /// <summary>
-        /// Finds the row furthest to the left with a square in
-        /// </summary>
-        /// <returns>The row furthest to the left with a square in</returns>
-        public int leftestColumnWithSquareIn()
-        {
-            int leftestCol = 0;
-
-            for (int col = squares.GetLength(0) - 1; col >=0 ; col--)
-                for (int row = 0; row < squares.GetLength(1); row++)
-                    if (squares[row, col])
-                        leftestCol = col;
-
-            return leftestCol;
-        }
-
-        /// <summary>
-        /// Finds the row furthest to the right with a square in
-        /// </summary>
-        /// <returns>The row furthest to the right with a square in</returns>
-        public int rightestColumnWithSquareIn()
-        {
-            int rightestCol = 0;
-
-            for (int col = 0; col < squares.GetLength(0); col++)
-                for (int row = 0; row < squares.GetLength(1); row++)
-                    if (squares[row, col])
-                        rightestCol = col;
-
-            return rightestCol;
-        }
-
-        #endregion positionChecks
-
     }
 }
