@@ -127,9 +127,9 @@ namespace Tetris
             if (currentBlock != null)
             {
                 // loop through each of the squares within the current block
-                for (int col = 0; col < currentBlock.squares.GetLength(0); col++)
+                for (int row = 0; row < currentBlock.squares.GetLength(0); row++)
                 {
-                    for (int row = 0; row < currentBlock.squares.GetLength(1); row++)
+                    for (int col = 0; col < currentBlock.squares.GetLength(1); col++)
                     {
                         // if there's something there
                         if (currentBlock.squares[row, col])
