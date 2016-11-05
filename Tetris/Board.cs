@@ -18,20 +18,20 @@ namespace Tetris
         /// <param name="noOfColumns">The number of columns on the board</param>
         public Board(int noOfRows, int noOfColumns, String blockSet)
         {
-            board = new int[noOfColumns, noOfRows + hiddenRows];
+            board = new int[noOfColumns, noOfRows + numHiddenRows];
             blockSpawner = new BlockSpawner(blockSet);
 
             // initialise the board by setting each cell as the default color
             for (int col = 0; col < noOfColumns; col++)
-                for (int row = 0; row < noOfRows + hiddenRows; row++)
+                for (int row = 0; row < noOfRows + numHiddenRows; row++)
                     board[col, row] = boardColor;
 
             // initialise variables based on the parameters
-            numberOfColumns = noOfColumns;
-            numberOfRows = noOfRows;
-            numberOfRowsTotal = noOfRows + hiddenRows;
+            numColumns = noOfColumns;
+            numVisibleRows = noOfRows;
+            totalNumRows = noOfRows + numHiddenRows;
 
-            Tick(); // stop a crash when holding a key down when starting a game
+            SpawnBlock();
         }
 
         #region variables
@@ -52,18 +52,13 @@ namespace Tetris
         public int score = 0;
 
         /// <summary>
-        /// The number of rows that are hidden above the top of the grid
-        /// </summary>
-        public readonly int hiddenRows = 20;
-
-        /// <summary>
         /// The default color of the board when there are no blocks there
         /// </summary>
         int boardColor = Color.PeachPuff.ToArgb();
 
         /// <summary>
         /// The board that is being played on.
-        /// board[col, row]
+        /// board[col, row]. (0, 0) is the upper left.
         /// </summary>
         public int[,] board;
 
@@ -75,17 +70,22 @@ namespace Tetris
         /// <summary>
         /// The number of visible columns on the board
         /// </summary>
-        int numberOfColumns;
+        int numColumns;
+
+        /// <summary>
+        /// The number of rows that are hidden above the top of the grid
+        /// </summary>
+        public readonly int numHiddenRows = 20;
 
         /// <summary>
         /// The number of rows on the board
         /// </summary>
-        int numberOfRows;
+        int numVisibleRows;
 
         /// <summary>
         /// The total number of rows on the board
         /// </summary>
-        int numberOfRowsTotal;
+        int totalNumRows;
 
         #endregion variables
 
@@ -94,13 +94,14 @@ namespace Tetris
         /// </summary>
         public void Tick()
         {
-            if (currentBlock == null || !CanLowerBlock())
+            if (!CanLowerBlock())
             {
+                LockBlock();
                 SpawnBlock();
             }
 
             TryLowerBlock();
-            manageFullRows();
+            DestroyFullRows();
         }
 
         #region board
@@ -110,13 +111,10 @@ namespace Tetris
         /// </summary>
         private void SpawnBlock()
         {
-            // lock the previous block into position
-            LockBlock();
-
             // spawn a new block
             currentBlock = blockSpawner.Next();
-            currentBlock.y = hiddenRows - 2;
-            currentBlock.x = (numberOfColumns - currentBlock.squares.GetLength(1)) / 2;
+            currentBlock.y = numHiddenRows - 2;
+            currentBlock.x = (numColumns - currentBlock.squares.GetLength(1)) / 2;
         }
 
         /// <summary>
@@ -124,20 +122,17 @@ namespace Tetris
         /// </summary>
         private void LockBlock()
         {
-            if (currentBlock != null)
+            // loop through each of the squares within the current block
+            for (int row = 0; row < currentBlock.squares.GetLength(0); row++)
             {
-                // loop through each of the squares within the current block
-                for (int row = 0; row < currentBlock.squares.GetLength(0); row++)
+                for (int col = 0; col < currentBlock.squares.GetLength(1); col++)
                 {
-                    for (int col = 0; col < currentBlock.squares.GetLength(1); col++)
+                    // if there's something there
+                    if (currentBlock.squares[row, col])
                     {
-                        // if there's something there
-                        if (currentBlock.squares[row, col])
-                        {
-                            Coordinate coord = currentBlock.toBoardCoordinates(new Coordinate(col, row));
-                            // lock it into position on the board
-                            board[coord.x, coord.y] = currentBlock.color.ToArgb();
-                        }
+                        Coordinate coord = currentBlock.toBoardCoordinates(new Coordinate(col, row));
+                        // lock it into position on the board
+                        board[coord.x, coord.y] = currentBlock.color.ToArgb();
                     }
                 }
             }
@@ -148,58 +143,48 @@ namespace Tetris
         /// <summary>
         /// Checks each of the rows and removes it if it's full, starting at the top and moving down.
         /// </summary>
-        private void manageFullRows()
+        private void DestroyFullRows()
         {
             int rowsDestroyedStart = rowsDestroyed;
 
-            for (int row = hiddenRows; row < numberOfRowsTotal; row++)
-                manageFullRow(row);
+            for (int row = numHiddenRows; row < totalNumRows; row++)
+            {
+                if (RowIsFull(row))
+                    DestroyRow(row);
+            }
 
             // give bonus points for clearing multiple rows at a time
             score += (rowsDestroyed - rowsDestroyedStart) * (rowsDestroyed - rowsDestroyedStart);
         }
 
         /// <summary>
-        /// Checks to see whether a specified row is full.
-        /// If it is, deletes the row and moves down the board above it.
-        /// </summary>
-        /// <param name="rowToCheck">The row in terms of board[col, row] to check</param>
-        private void manageFullRow(int rowToCheck)
-        {
-            if (hasFullRow(rowToCheck))
-                removeRow(rowToCheck);
-        }
-
-        /// <summary>
         /// Checks to see whether the specified row is full and should be removed
         /// </summary>
-        /// <param name="rowToCheck">The row in terms of board[col, row] to check</param>
+        /// <param name="rowToCheck">The row to check</param>
         /// <returns>Whether the specified row is full</returns>
-        private Boolean hasFullRow(int rowToCheck)
+        private Boolean RowIsFull(int row)
         {
-            Boolean full = true;
+            for (int col = 0; col < numColumns; col++)
+                if (board[col, row] == boardColor)
+                    return false;
 
-            for (int col = 0; col < numberOfColumns; col++)
-                if (board[col, rowToCheck] == boardColor)
-                    full = false;
-
-            return full;
+            return true;
         }
 
         /// <summary>
         /// Removes a row from the game board and drops the remaining squares down from above
         /// </summary>
-        /// <param name="row">The row in terms of board[col, row] to remove</param>
-        private void removeRow(int rowToRemove)
+        /// <param name="row">The row to remove</param>
+        private void DestroyRow(int rowToRemove)
         {
             if (rowToRemove == 0)
-                return;
+                throw new IndexOutOfRangeException();
 
             // start on the specified row and move up
             for (int row = rowToRemove; row > 0; row--)
             {
                 // passing through each column
-                for (int col = 0; col < numberOfColumns; col++)
+                for (int col = 0; col < numColumns; col++)
                 {
                     // and overwriting the current position with the one above
                     board[col, row] = board[col, row - 1];
@@ -209,10 +194,10 @@ namespace Tetris
             rowsDestroyed++;
         }
 
-        public bool topRowHasSquare()
+        public bool TopRowHasSquare()
         {
-            int row = numberOfRows - 1;
-            for (int col = 0; col < numberOfColumns; col++)
+            int row = numVisibleRows - 1;
+            for (int col = 0; col < numColumns; col++)
             {
                 if (board[col, row] != boardColor)
                 {
@@ -231,7 +216,7 @@ namespace Tetris
         public void TryRotateBlock()
         {
             Block rotated = currentBlock.RotatedClockwise();
-            if (canBeHere(rotated))
+            if (CanBeHere(rotated))
             {
                 currentBlock = rotated;
             }
@@ -241,22 +226,18 @@ namespace Tetris
         /// Lowers the current block down one row if possible
         /// </summary>
         /// <returns>Whether the block could be lowered</returns>
-        public bool TryLowerBlock()
+        public void TryLowerBlock()
         {
             currentBlock.y++;
 
-            if (!canBeHere(currentBlock))
-            {
+            if (!CanBeHere(currentBlock))
                 currentBlock.y--;
-                return false;
-            }
-            return true;
         }
 
         public bool CanLowerBlock()
         {
             currentBlock.y++;
-            bool worked = canBeHere(currentBlock);
+            bool worked = CanBeHere(currentBlock);
             currentBlock.y--;
             return worked;
         }
@@ -268,7 +249,7 @@ namespace Tetris
         {
             currentBlock.x--;
 
-            if (!canBeHere(currentBlock))
+            if (!CanBeHere(currentBlock))
                 currentBlock.x++;
         }
 
@@ -279,41 +260,18 @@ namespace Tetris
         {
             currentBlock.x++;
 
-            if (!canBeHere(currentBlock))
+            if (!CanBeHere(currentBlock))
                 currentBlock.x--;
         }
         #endregion blockMovement
-
-        #region blockPositionChecks
-
-        /// <summary>
-        /// Checks to see whether there is a square in the specified position on the Board
-        /// </summary>
-        /// <param name="coord">The coordinate to check</param>
-        /// <returns>Whether there is a square there or not</returns>
-        private Boolean hasSquare(Coordinate coord)
-        {
-            Boolean hasSquare = false;
-
-            if (coord.x < numberOfColumns && coord.x >= 0 &&
-                    coord.y < numberOfRowsTotal && coord.y >= 0 &&
-                        board[coord.x, coord.y] != boardColor)
-            {
-                hasSquare = true;
-            }
-
-            return hasSquare;
-        }
 
         /// <summary>
         /// Checks to see whether the block is allowed to be in the specified position
         /// </summary>
         /// <param name="block">The block to check</param>
         /// <returns>Whether the block is allowed to be there</returns>
-        private Boolean canBeHere(Block block)
+        private Boolean CanBeHere(Block block)
         {
-            Boolean canBeHere = true;
-
             // loop through each of the squares within the current block
             for (int col = 0; col < block.squares.GetLength(0); col++)
             {
@@ -324,19 +282,18 @@ namespace Tetris
                     {
                         // check to see if there's something already here
                         Coordinate coord = block.toBoardCoordinates(new Coordinate(col, row));
-                        if (hasSquare(coord) || coord.x >= numberOfColumns || coord.x < 0
-                                || coord.y >= numberOfRowsTotal)
+
+                        if (coord.x >= numColumns || coord.x < 0 || 
+                            coord.y >= totalNumRows || board[coord.x, coord.y] != boardColor)
                         {
-                            canBeHere = false;
+                            return false;
                         }
                     }
                 }
             }
 
-            return canBeHere;
+            return true;
         }
-
-        #endregion blockPositionChecks
 
         #endregion board
     }
