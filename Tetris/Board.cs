@@ -74,7 +74,7 @@ namespace Tetris
         /// <summary>
         /// The number of rows that are hidden above the top of the grid
         /// </summary>
-        public readonly int numHiddenRows = 20;
+        public readonly int numHiddenRows = 2;
 
         /// <summary>
         /// The number of rows on the board

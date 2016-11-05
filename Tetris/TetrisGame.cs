@@ -46,7 +46,7 @@ namespace Tetris
         /// <summary>
         /// The squares that are visible on the board
         /// </summary>
-        Dictionary<string, Square> squares = new Dictionary<string, Square>();
+        Square[,] squares;
 
         /// <summary>
         /// A game of Tetris implemented as a WinForms application
@@ -100,23 +100,18 @@ namespace Tetris
         #region GUI
 
         /// <summary>
-        /// Calculates a string to use as the key for the squares hash
-        /// </summary>
-        private String SquaresKey(int row, int col)
-        {
-            return "R" + row.ToString() + "C" + col.ToString();
-        }
-
-        /// <summary>
         /// Creates the squares which make up the visible portion of the board
         /// </summary>
         private void CreateSquares()
         {
-            foreach (Square square in squares.Values)
+            if (squares != null)
             {
-                square.Dispose();
+                foreach (Square square in squares)
+                {
+                    square.Dispose();
+                }
             }
-            squares.Clear();
+            squares = new Square[numberOfRows, numberOfColumns];
 
             for (int row = 0; row < numberOfRows; row++)
             {
@@ -129,7 +124,7 @@ namespace Tetris
                     square.Top = row * squareDimensions;
                     square.Left = col * squareDimensions;
 
-                    squares.Add(SquaresKey(row, col), square);
+                    squares[row, col] = square;
                 }
             }
         }
@@ -140,13 +135,11 @@ namespace Tetris
         private void UpdateBoard()
         {
             // update the color of each of the squares on the board
-            Square square;
             for (int row = 0; row < numberOfRows; row++)
             {
                 for (int col = 0; col < numberOfColumns; col++)
                 {
-                    squares.TryGetValue(SquaresKey(row, col), out square);
-                    square.color = board.board[row + board.numHiddenRows, col];
+                    squares[row, col].color = board.board[row + board.numHiddenRows, col];
                 }
             }
 
@@ -161,8 +154,7 @@ namespace Tetris
                     if (block.squares[row, col] && coord.col >= 0 && coord.col < numberOfColumns
                             && coord.row >= board.numHiddenRows && coord.row < numberOfRows + board.numHiddenRows)
                     {
-                        squares.TryGetValue(SquaresKey(coord.row - board.numHiddenRows, coord.col), out square);
-                        square.color = block.color.ToArgb();
+                        squares[coord.row - board.numHiddenRows, coord.col].color = block.color.ToArgb();
                     }
                 }
             }
