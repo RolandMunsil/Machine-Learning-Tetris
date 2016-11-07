@@ -67,6 +67,9 @@
     <Compile Include="Block.cs" />
     <Compile Include="Board.cs" />
     <Compile Include="Coordinate.cs" />
+    <Compile Include="NEAT\ConnectionGene.cs" />
+    <Compile Include="NEAT\Genome.cs" />
+    <Compile Include="NEAT\NeuralNetwork.cs" />
     <Compile Include="Square.cs">
       <SubType>UserControl</SubType>
     </Compile>

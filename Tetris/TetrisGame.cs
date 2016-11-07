@@ -236,6 +236,7 @@ namespace Tetris
                 {
                     UpdateBoard();
                     //This is a hack, in the future start a separate thread
+                    //http://www.yoda.arachsys.com/csharp/threads/winforms.shtml
                     Application.DoEvents();
                 }
             }
@@ -244,7 +245,6 @@ namespace Tetris
             if (!showUIWhenPlaying)
             {
                 //We need to show the final state.
-                //CreateSquares();
                 UpdateBoard();
                 rowsCleared.Text = board.rowsDestroyed.ToString();
                 score.Text = board.score.ToString();
