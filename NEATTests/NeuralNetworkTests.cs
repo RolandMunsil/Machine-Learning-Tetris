@@ -13,9 +13,7 @@ namespace NEATTests
         public void TestJustTwoNodes()
         {
             //Genome just leaves its input unchanged (aside from activation function)
-            Genome genome = new Genome();
-            genome.numInputs = 1;
-            genome.numOutputs = 1;
+            Genome genome = new Genome(1, 1, 0);
             genome.connectionGenes = new List<ConnectionGene>();
             genome.connectionGenes.Add(new ConnectionGene(0, 1, 1, true, 1));
 
@@ -43,9 +41,7 @@ namespace NEATTests
             for (int numInputs = 1; numInputs < 100; numInputs++)
             {
                 //Genome just leaves its input unchanged (aside from activation function)
-                Genome genome = new Genome();
-                genome.numInputs = numInputs;
-                genome.numOutputs = numInputs;
+                Genome genome = new Genome(numInputs, numInputs, 0);
                 genome.connectionGenes = new List<ConnectionGene>();
                 for (int i = 0; i < numInputs; i++)
                 {
@@ -82,13 +78,11 @@ namespace NEATTests
         {
             for (int numInputs = 1; numInputs < 100; numInputs++)
             {
-                Genome genome = new Genome();
-                genome.numInputs = numInputs;
-                genome.numOutputs = 1;
+                Genome genome = new Genome(numInputs, 1, 0);
                 genome.connectionGenes = new List<ConnectionGene>();
                 for (int i = 0; i < numInputs; i++)
                 {
-                    genome.connectionGenes.Add(new ConnectionGene(i, numInputs, i+1, true, 1));
+                    genome.connectionGenes.Add(new ConnectionGene(i, numInputs, i + 1, true, 1));
                 }
 
                 NeuralNetwork net = new NeuralNetwork(genome);
@@ -104,12 +98,12 @@ namespace NEATTests
                 {
                     Assert.IsTrue(outputNode.sourceNodeNums.Contains(i));
                     int idx = outputNode.sourceNodeNums.IndexOf(i);
-                    Assert.AreEqual(outputNode.sourceNodeWeights[idx], i+1);
+                    Assert.AreEqual(outputNode.sourceNodeWeights[idx], i + 1);
                 }
 
                 double[] inputs = new double[numInputs];
                 for (int i = 0; i < numInputs; i++)
-                    inputs[i] = i+1;
+                    inputs[i] = i + 1;
 
                 //Output should be activationfunc(1*1 + 2*2 + ...)
                 double[] outputs = net.FeedForward(inputs);
@@ -124,9 +118,7 @@ namespace NEATTests
         {
             for (int numInputs = 1; numInputs < 100; numInputs++)
             {
-                Genome genome = new Genome();
-                genome.numInputs = numInputs;
-                genome.numOutputs = numInputs;
+                Genome genome = new Genome(numInputs, numInputs, 0);
                 genome.connectionGenes = new List<ConnectionGene>();
                 for (int i = 0; i < numInputs; i++)
                 {
@@ -137,7 +129,7 @@ namespace NEATTests
                 {
                     for (int output = 0; output < numInputs; output++)
                     {
-                        genome.connectionGenes.Add(new ConnectionGene(input, numInputs+output, 1, false, 1));
+                        genome.connectionGenes.Add(new ConnectionGene(input, numInputs + output, 1, false, 1));
                     }
                 }
 
@@ -160,10 +152,7 @@ namespace NEATTests
         [TestMethod]
         public void TestHiddenLayers()
         {
-            Genome genome = new Genome();
-            genome.numInputs = 2; //0, 1
-            genome.numOutputs = 3; //2, 3, 4
-            genome.numHiddenNodes = 2; //5, 6
+            Genome genome = new Genome(2, 3, 2);
             genome.connectionGenes = new List<ConnectionGene>
             {
                 new ConnectionGene(0, 2,  1,        true, 1),
@@ -183,7 +172,7 @@ namespace NEATTests
 
             Func<double, double> a = net.ActivationFunc;
 
-            for(double i0 = -10; i0 <= 10; i0 += .1)
+            for (double i0 = -10; i0 <= 10; i0 += .1)
             {
                 for (double i1 = -10; i1 <= 10; i1 += .1)
                 {
@@ -205,7 +194,48 @@ namespace NEATTests
 
                 }
             }
+        }
 
+        [TestMethod]
+        public void TestRemovalOfNodesWithoutInputs()
+        {
+            Genome genome = new Genome(10, 11, 45 + 100);
+
+            //Add 1 legit connection to ensure that calculation still works
+            genome.connectionGenes.Add(new ConnectionGene(0, 20, 1, true, 0));
+
+            //Big ol tree thing of nodes
+            Func<int, int, int> nodeAt = (layer, index) => (10 + 11 + (layer * (layer + 1) / 2) + index);
+            //top layer - connected to inputs
+            for(int i = 0; i < 9; i++)
+            {
+                genome.connectionGenes.Add(new ConnectionGene(nodeAt(8, i), 10 + i, 0, true, 0));
+                genome.connectionGenes.Add(new ConnectionGene(nodeAt(8, i), 10 + (i+1), 0, true, 0));
+            }
+            //Remaining layers
+            for (int layer = 0; layer < 8; layer++)
+            {
+                for (int i = 0; i < layer + 1; i++)
+                {
+                    genome.connectionGenes.Add(new ConnectionGene(nodeAt(layer, i), nodeAt(layer+1, i), 0, true, 0));
+                    genome.connectionGenes.Add(new ConnectionGene(nodeAt(layer, i), nodeAt(layer+1, i + 1), 0, true, 0));
+                }
+            }
+
+            //String of nodes leading to last input
+            genome.connectionGenes.Add(new ConnectionGene((10 + 11 + 45 + 100) - 1, (10 + 11) - 1, 0, true, 0));
+            for (int outN = (10 + 11 + 45 + 100) - 1; outN > (10 + 11 + 45); outN--)
+            {
+                genome.connectionGenes.Add(new ConnectionGene(outN - 1, outN, 0, true, 0));
+            }
+
+            NeuralNetwork net = new NeuralNetwork(genome);
+            Assert.AreEqual(net.numInputs, 10);
+            Assert.AreEqual(net.numOutputs, 11);
+            Assert.AreEqual(net.nonInputNodes.Length, 1);
+
+            double[] outputs = net.FeedForward(new double[] { 3, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            Assert.AreEqual(outputs[10], net.ActivationFunc(3));
         }
     }
 }

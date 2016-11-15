@@ -23,24 +23,9 @@ namespace Tetris
         /// </summary>
         private int nextIndex = 0;
 
-        /// <summary>
-        /// Block shapes that have been loaded from a file
-        /// </summary>
-        private List<String[]> loadedBlockTypes = null;
-
-        public BlockSpawner()
+        public BlockSpawner(Random rand)
         {
-            sequence = GenerateBlockTypeSequence();
-        }
-
-        /// <summary>
-        /// Create a block type spawner where the block positions are loaded from a file
-        /// </summary>
-        /// <param name="name">The name of the file to load</param>
-        public BlockSpawner(String name)
-        {
-            loadedBlockTypes = BlockLoader.load(name);
-
+            this.rand = rand;
             sequence = GenerateBlockTypeSequence();
         }
 
@@ -62,41 +47,9 @@ namespace Tetris
         /// </summary>
         private BlockType[] GenerateBlockTypeSequence()
         {
-            if (loadedBlockTypes == null || loadedBlockTypes.Count == 0)
-            {
-                BlockType[] sequence = GenerateDefaultBlockTypes();
-                Shuffle(sequence);
-                return sequence;
-            }
-            else
-            {
-                BlockType[] sequence = new BlockType[7];
-
-                int count = 0;
-
-                foreach (String[] block in loadedBlockTypes)
-                {
-                    sequence[count] = new BlockType();
-                    sequence[count].shape = new Boolean[block.Length, block.Length];
-                    // load the positions
-                    for (var row = 0; row < block.Length; row++)
-                    {
-                        char[] rowArr = block[row].ToCharArray();
-                        for (var col = 0; col < block[row].Length; col++)
-                        {
-                            sequence[count].shape[row, col] = rowArr[col] == BlockLoader.solidIndicator;
-                        }
-                    }
-                    // give it a random color. Pretty ^_^
-                    KnownColor[] names = (KnownColor[]) Enum.GetValues(typeof(KnownColor));
-                    KnownColor randomColorName = names[rand.Next(names.Length)];
-                    sequence[count].color = Color.FromKnownColor(randomColorName);
-                    
-                    count++;
-                }
-                Shuffle(sequence);
-                return sequence;
-            }
+            BlockType[] sequence = GenerateDefaultBlockTypes();
+            Shuffle(sequence);
+            return sequence;
         }
 
         /// <summary>

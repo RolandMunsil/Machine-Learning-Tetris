@@ -39,21 +39,27 @@
             this.rowsClearedLabel = new System.Windows.Forms.Label();
             this.rowsCleared = new System.Windows.Forms.Label();
             this.gameWindow = new System.Windows.Forms.Panel();
+            this.rotateOutputLabel = new System.Windows.Forms.Label();
+            this.downOutputLabel = new System.Windows.Forms.Label();
+            this.rightOutputLabel = new System.Windows.Forms.Label();
+            this.leftOutputLabel = new System.Windows.Forms.Label();
             this.upcomingBlocks = new System.Windows.Forms.Panel();
+            this.fitnessLabel = new System.Windows.Forms.Label();
+            this.organismLabel = new System.Windows.Forms.Label();
+            this.speciesLabel = new System.Windows.Forms.Label();
+            this.genLabel = new System.Windows.Forms.Label();
             this.sqSizeSelect = new System.Windows.Forms.NumericUpDown();
             this.sqSizeLabel = new System.Windows.Forms.Label();
             this.boardColsSelect = new System.Windows.Forms.NumericUpDown();
             this.boardRowsSelect = new System.Windows.Forms.NumericUpDown();
             this.boardColsLabel = new System.Windows.Forms.Label();
             this.boardRowsLabel = new System.Windows.Forms.Label();
-            this.blocksetList = new System.Windows.Forms.ComboBox();
-            this.blocksetLabel = new System.Windows.Forms.Label();
             this.textBox2 = new System.Windows.Forms.TextBox();
-            this.textBox1 = new System.Windows.Forms.TextBox();
             this.score = new System.Windows.Forms.Label();
             this.tickTimer = new System.Windows.Forms.Timer(this.components);
             this.tableLayout.SuspendLayout();
             this.menuStrip.SuspendLayout();
+            this.gameWindow.SuspendLayout();
             this.upcomingBlocks.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.sqSizeSelect)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.boardColsSelect)).BeginInit();
@@ -65,7 +71,7 @@
             this.tableLayout.ColumnCount = 3;
             this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 84.28835F));
             this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15.71165F));
-            this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 180F));
+            this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 183F));
             this.tableLayout.Controls.Add(this.learnButton, 2, 2);
             this.tableLayout.Controls.Add(this.scoreLabel, 0, 5);
             this.tableLayout.Controls.Add(this.menuStrip, 0, 0);
@@ -86,7 +92,7 @@
             this.tableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 45F));
             this.tableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 52F));
             this.tableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 81F));
-            this.tableLayout.Size = new System.Drawing.Size(984, 806);
+            this.tableLayout.Size = new System.Drawing.Size(1484, 806);
             this.tableLayout.TabIndex = 0;
             // 
             // learnButton
@@ -94,7 +100,7 @@
             this.learnButton.AutoSize = true;
             this.tableLayout.SetColumnSpan(this.learnButton, 2);
             this.learnButton.Dock = System.Windows.Forms.DockStyle.Right;
-            this.learnButton.Location = new System.Drawing.Point(681, 630);
+            this.learnButton.Location = new System.Drawing.Point(1181, 630);
             this.learnButton.Name = "learnButton";
             this.learnButton.Size = new System.Drawing.Size(300, 39);
             this.learnButton.TabIndex = 10;
@@ -106,7 +112,7 @@
             // 
             this.scoreLabel.AutoSize = true;
             this.scoreLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.scoreLabel.Location = new System.Drawing.Point(681, 724);
+            this.scoreLabel.Location = new System.Drawing.Point(1100, 724);
             this.scoreLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.scoreLabel.Name = "scoreLabel";
             this.scoreLabel.Size = new System.Drawing.Size(89, 29);
@@ -122,7 +128,7 @@
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
             this.menuStrip.Padding = new System.Windows.Forms.Padding(9, 3, 0, 3);
-            this.menuStrip.Size = new System.Drawing.Size(984, 35);
+            this.menuStrip.Size = new System.Drawing.Size(1484, 35);
             this.menuStrip.TabIndex = 0;
             this.menuStrip.Text = "menuStrip";
             // 
@@ -144,10 +150,10 @@
             // 
             this.tableLayout.SetColumnSpan(this.newGameButton, 2);
             this.newGameButton.Dock = System.Windows.Forms.DockStyle.Top;
-            this.newGameButton.Location = new System.Drawing.Point(681, 587);
+            this.newGameButton.Location = new System.Drawing.Point(1100, 587);
             this.newGameButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.newGameButton.Name = "newGameButton";
-            this.newGameButton.Size = new System.Drawing.Size(299, 35);
+            this.newGameButton.Size = new System.Drawing.Size(380, 35);
             this.newGameButton.TabIndex = 3;
             this.newGameButton.Text = "New Game";
             this.newGameButton.UseVisualStyleBackColor = true;
@@ -157,7 +163,7 @@
             // 
             this.rowsClearedLabel.AutoSize = true;
             this.rowsClearedLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rowsClearedLabel.Location = new System.Drawing.Point(681, 672);
+            this.rowsClearedLabel.Location = new System.Drawing.Point(1100, 672);
             this.rowsClearedLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.rowsClearedLabel.Name = "rowsClearedLabel";
             this.rowsClearedLabel.Size = new System.Drawing.Size(85, 29);
@@ -168,7 +174,7 @@
             // 
             this.rowsCleared.AutoSize = true;
             this.rowsCleared.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rowsCleared.Location = new System.Drawing.Point(807, 672);
+            this.rowsCleared.Location = new System.Drawing.Point(1304, 672);
             this.rowsCleared.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.rowsCleared.Name = "rowsCleared";
             this.rowsCleared.Size = new System.Drawing.Size(27, 29);
@@ -177,33 +183,134 @@
             // 
             // gameWindow
             // 
+            this.gameWindow.Controls.Add(this.rotateOutputLabel);
+            this.gameWindow.Controls.Add(this.downOutputLabel);
+            this.gameWindow.Controls.Add(this.rightOutputLabel);
+            this.gameWindow.Controls.Add(this.leftOutputLabel);
             this.gameWindow.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gameWindow.Location = new System.Drawing.Point(4, 46);
             this.gameWindow.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.gameWindow.Name = "gameWindow";
             this.tableLayout.SetRowSpan(this.gameWindow, 5);
-            this.gameWindow.Size = new System.Drawing.Size(669, 755);
+            this.gameWindow.Size = new System.Drawing.Size(1088, 755);
             this.gameWindow.TabIndex = 6;
+            // 
+            // rotateOutputLabel
+            // 
+            this.rotateOutputLabel.BackColor = System.Drawing.SystemColors.Info;
+            this.rotateOutputLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.rotateOutputLabel.Cursor = System.Windows.Forms.Cursors.Default;
+            this.rotateOutputLabel.Font = new System.Drawing.Font("Arial Black", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.rotateOutputLabel.Location = new System.Drawing.Point(995, 502);
+            this.rotateOutputLabel.Name = "rotateOutputLabel";
+            this.rotateOutputLabel.Size = new System.Drawing.Size(50, 50);
+            this.rotateOutputLabel.TabIndex = 3;
+            this.rotateOutputLabel.Text = "↺";
+            this.rotateOutputLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // downOutputLabel
+            // 
+            this.downOutputLabel.BackColor = System.Drawing.SystemColors.Info;
+            this.downOutputLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.downOutputLabel.Cursor = System.Windows.Forms.Cursors.Default;
+            this.downOutputLabel.Font = new System.Drawing.Font("Arial Black", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.downOutputLabel.Location = new System.Drawing.Point(995, 342);
+            this.downOutputLabel.Name = "downOutputLabel";
+            this.downOutputLabel.Size = new System.Drawing.Size(50, 50);
+            this.downOutputLabel.TabIndex = 2;
+            this.downOutputLabel.Text = "↓";
+            this.downOutputLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // rightOutputLabel
+            // 
+            this.rightOutputLabel.BackColor = System.Drawing.SystemColors.Info;
+            this.rightOutputLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.rightOutputLabel.Cursor = System.Windows.Forms.Cursors.Default;
+            this.rightOutputLabel.Font = new System.Drawing.Font("Arial Black", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.rightOutputLabel.Location = new System.Drawing.Point(995, 192);
+            this.rightOutputLabel.Name = "rightOutputLabel";
+            this.rightOutputLabel.Size = new System.Drawing.Size(50, 50);
+            this.rightOutputLabel.TabIndex = 1;
+            this.rightOutputLabel.Text = "→";
+            this.rightOutputLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // leftOutputLabel
+            // 
+            this.leftOutputLabel.BackColor = System.Drawing.SystemColors.Info;
+            this.leftOutputLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.leftOutputLabel.Cursor = System.Windows.Forms.Cursors.Default;
+            this.leftOutputLabel.Font = new System.Drawing.Font("Arial Black", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.leftOutputLabel.Location = new System.Drawing.Point(995, 44);
+            this.leftOutputLabel.Name = "leftOutputLabel";
+            this.leftOutputLabel.Size = new System.Drawing.Size(50, 50);
+            this.leftOutputLabel.TabIndex = 0;
+            this.leftOutputLabel.Text = "←";
+            this.leftOutputLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // upcomingBlocks
             // 
             this.tableLayout.SetColumnSpan(this.upcomingBlocks, 2);
+            this.upcomingBlocks.Controls.Add(this.fitnessLabel);
+            this.upcomingBlocks.Controls.Add(this.organismLabel);
+            this.upcomingBlocks.Controls.Add(this.speciesLabel);
+            this.upcomingBlocks.Controls.Add(this.genLabel);
             this.upcomingBlocks.Controls.Add(this.sqSizeSelect);
             this.upcomingBlocks.Controls.Add(this.sqSizeLabel);
             this.upcomingBlocks.Controls.Add(this.boardColsSelect);
             this.upcomingBlocks.Controls.Add(this.boardRowsSelect);
             this.upcomingBlocks.Controls.Add(this.boardColsLabel);
             this.upcomingBlocks.Controls.Add(this.boardRowsLabel);
-            this.upcomingBlocks.Controls.Add(this.blocksetList);
-            this.upcomingBlocks.Controls.Add(this.blocksetLabel);
             this.upcomingBlocks.Controls.Add(this.textBox2);
-            this.upcomingBlocks.Controls.Add(this.textBox1);
             this.upcomingBlocks.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.upcomingBlocks.Location = new System.Drawing.Point(681, 46);
+            this.upcomingBlocks.Location = new System.Drawing.Point(1100, 46);
             this.upcomingBlocks.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.upcomingBlocks.Name = "upcomingBlocks";
-            this.upcomingBlocks.Size = new System.Drawing.Size(299, 531);
+            this.upcomingBlocks.Size = new System.Drawing.Size(380, 531);
             this.upcomingBlocks.TabIndex = 7;
+            // 
+            // fitnessLabel
+            // 
+            this.fitnessLabel.AutoSize = true;
+            this.fitnessLabel.Font = new System.Drawing.Font("Arial", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.fitnessLabel.Location = new System.Drawing.Point(13, 154);
+            this.fitnessLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.fitnessLabel.Name = "fitnessLabel";
+            this.fitnessLabel.Size = new System.Drawing.Size(166, 25);
+            this.fitnessLabel.TabIndex = 17;
+            this.fitnessLabel.Text = "Original Fitness:";
+            // 
+            // organismLabel
+            // 
+            this.organismLabel.AutoSize = true;
+            this.organismLabel.Font = new System.Drawing.Font("Arial", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.organismLabel.Location = new System.Drawing.Point(13, 96);
+            this.organismLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.organismLabel.Name = "organismLabel";
+            this.organismLabel.Size = new System.Drawing.Size(105, 25);
+            this.organismLabel.TabIndex = 16;
+            this.organismLabel.Text = "Organism";
+            // 
+            // speciesLabel
+            // 
+            this.speciesLabel.AutoSize = true;
+            this.speciesLabel.Font = new System.Drawing.Font("Arial", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.speciesLabel.Location = new System.Drawing.Point(13, 55);
+            this.speciesLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.speciesLabel.Name = "speciesLabel";
+            this.speciesLabel.Size = new System.Drawing.Size(90, 25);
+            this.speciesLabel.TabIndex = 15;
+            this.speciesLabel.Text = "Species";
+            // 
+            // genLabel
+            // 
+            this.genLabel.AutoSize = true;
+            this.genLabel.Font = new System.Drawing.Font("Arial", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.genLabel.Location = new System.Drawing.Point(13, 15);
+            this.genLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.genLabel.Name = "genLabel";
+            this.genLabel.Size = new System.Drawing.Size(118, 25);
+            this.genLabel.TabIndex = 14;
+            this.genLabel.Text = "Generation";
             // 
             // sqSizeSelect
             // 
@@ -305,48 +412,19 @@
             this.boardRowsLabel.TabIndex = 8;
             this.boardRowsLabel.Text = "Board Rows:";
             // 
-            // blocksetList
-            // 
-            this.blocksetList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.blocksetList.FormattingEnabled = true;
-            this.blocksetList.Location = new System.Drawing.Point(48, 325);
-            this.blocksetList.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.blocksetList.Name = "blocksetList";
-            this.blocksetList.Size = new System.Drawing.Size(192, 28);
-            this.blocksetList.TabIndex = 7;
-            // 
-            // blocksetLabel
-            // 
-            this.blocksetLabel.AutoSize = true;
-            this.blocksetLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.blocksetLabel.Location = new System.Drawing.Point(4, 289);
-            this.blocksetLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.blocksetLabel.Name = "blocksetLabel";
-            this.blocksetLabel.Size = new System.Drawing.Size(120, 29);
-            this.blocksetLabel.TabIndex = 5;
-            this.blocksetLabel.Text = "Blockset:";
-            // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(48, 145);
+            this.textBox2.Location = new System.Drawing.Point(131, 323);
             this.textBox2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(148, 26);
             this.textBox2.TabIndex = 1;
             // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(48, 66);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(148, 26);
-            this.textBox1.TabIndex = 0;
-            // 
             // score
             // 
             this.score.AutoSize = true;
             this.score.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.score.Location = new System.Drawing.Point(807, 724);
+            this.score.Location = new System.Drawing.Point(1304, 724);
             this.score.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.score.Name = "score";
             this.score.Size = new System.Drawing.Size(27, 29);
@@ -362,7 +440,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(984, 806);
+            this.ClientSize = new System.Drawing.Size(1484, 806);
             this.Controls.Add(this.tableLayout);
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip;
@@ -374,6 +452,7 @@
             this.tableLayout.PerformLayout();
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
+            this.gameWindow.ResumeLayout(false);
             this.upcomingBlocks.ResumeLayout(false);
             this.upcomingBlocks.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.sqSizeSelect)).EndInit();
@@ -402,12 +481,17 @@
         private System.Windows.Forms.NumericUpDown boardRowsSelect;
         private System.Windows.Forms.Label boardColsLabel;
         private System.Windows.Forms.Label boardRowsLabel;
-        private System.Windows.Forms.ComboBox blocksetList;
-        private System.Windows.Forms.Label blocksetLabel;
         private System.Windows.Forms.TextBox textBox2;
-        private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label score;
         private System.Windows.Forms.Button learnButton;
+        private System.Windows.Forms.Label fitnessLabel;
+        private System.Windows.Forms.Label organismLabel;
+        private System.Windows.Forms.Label speciesLabel;
+        private System.Windows.Forms.Label genLabel;
+        private System.Windows.Forms.Label rotateOutputLabel;
+        private System.Windows.Forms.Label downOutputLabel;
+        private System.Windows.Forms.Label rightOutputLabel;
+        private System.Windows.Forms.Label leftOutputLabel;
     }
 }
 

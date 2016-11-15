@@ -1,18 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
 namespace Tetris.NEAT
 {
-    public class ConnectionGene
+    [DebuggerDisplay("{inNodeNum}->{outNodeNum} with weight {weight} (inn {innovationNumber}) [enabled={enabled}]")]
+    public struct ConnectionGene
     {
         //NOTE: node numbers are created assuming the nodes are in the order (input nodes, output nodes, hidden nodes)
-        public readonly int inNodeNum;
-        public readonly int outNodeNum;
-        public readonly double weight;
-        public readonly bool enabled;
-        public readonly int innovationNumber;
+        public int inNodeNum;
+        public int outNodeNum;
+        public double weight;
+        public bool enabled;
+        public int innovationNumber;
 
         public ConnectionGene(int inNodeNum, int outNodeNum, double weight, bool enabled, int innovationNumber)
         {

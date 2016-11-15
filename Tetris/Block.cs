@@ -45,8 +45,7 @@ namespace Tetris
         {
             //this.squares = (bool[,])original.squares.Clone();
             this.color = original.color;
-            this.topLeft.col = original.topLeft.col;
-            this.topLeft.row = original.topLeft.row;
+            this.topLeft = new Coordinate(original.topLeft.row, original.topLeft.col);
         }
 
         /// <summary>

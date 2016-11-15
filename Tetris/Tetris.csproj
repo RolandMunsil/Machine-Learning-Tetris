@@ -30,7 +30,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -49,6 +49,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MathNet.Numerics, Version=3.13.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\MathNet.Numerics.3.13.1\lib\net40\MathNet.Numerics.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic.PowerPacks, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -61,7 +66,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BlockLoader.cs" />
     <Compile Include="BlockSpawner.cs" />
     <Compile Include="BlockType.cs" />
     <Compile Include="Block.cs" />
@@ -69,7 +73,10 @@
     <Compile Include="Coordinate.cs" />
     <Compile Include="NEAT\ConnectionGene.cs" />
     <Compile Include="NEAT\Genome.cs" />
+    <Compile Include="NEAT\NEAT.cs" />
     <Compile Include="NEAT\NeuralNetwork.cs" />
+    <Compile Include="NEAT\Organism.cs" />
+    <Compile Include="NEAT\Species.cs" />
     <Compile Include="Square.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -99,6 +106,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

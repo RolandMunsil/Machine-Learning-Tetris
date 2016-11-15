@@ -26,6 +26,7 @@ namespace Tetris.NEAT
         public int numOutputs;
         //The non-input nodes, NOT ordered by number! Ordered by calculation order.
         public NonInputNode[] nonInputNodes;
+        public int totalNodes;
 
         const double ACTIVATION_NOT_CALCULATED = Double.NaN;
 
@@ -33,9 +34,13 @@ namespace Tetris.NEAT
         {
             numInputs = genome.numInputs;
             numOutputs = genome.numOutputs;
-            NonInputNode[] unorderedNodes = new NonInputNode[genome.numOutputs + genome.numHiddenNodes];
-            for(int i = 0; i < unorderedNodes.Length; i++)
-                unorderedNodes[i] = new NonInputNode();
+            totalNodes = genome.numInputs + genome.numOutputs + genome.numHiddenNodes;
+            List<NonInputNode> unorderedNodes = new List<NonInputNode>(genome.numOutputs + genome.numHiddenNodes);
+            for (int i = 0; i < genome.numOutputs + genome.numHiddenNodes; i++)
+            {
+                unorderedNodes.Add(new NonInputNode());
+                unorderedNodes[i].number = i + numInputs;
+            }
 
             //Create nodes
             foreach (ConnectionGene connection in genome.connectionGenes.Where(gene => gene.enabled))
@@ -45,14 +50,33 @@ namespace Tetris.NEAT
 
                 outNode.sourceNodeNums.Add(connection.inNodeNum);
                 outNode.sourceNodeWeights.Add(connection.weight);
-                outNode.number = connection.outNodeNum;
+                if (outNode.number != connection.outNodeNum)
+                    throw new Exception();
+            }
 
+            //Recursively remove any nodes that have no inputs
+            for(int i = 0; i < unorderedNodes.Count; i++)
+            {
+                if(unorderedNodes[i].sourceNodeNums.Count == 0)
+                {
+                    int num = unorderedNodes[i].number;
+                    unorderedNodes.RemoveAt(i);
+                    //Remove references to node
+                    foreach(NonInputNode node in unorderedNodes.Where(node => node.sourceNodeNums.Contains(num)))
+                    {
+                        int index = node.sourceNodeNums.IndexOf(num);
+                        node.sourceNodeNums.RemoveAt(index);
+                        node.sourceNodeWeights.RemoveAt(index);
+                    }
+                    //Restart search now that graph has been updated
+                    i = -1;
+                }
             }
 
             //Order nodes using sort-of DFS
-            List<NonInputNode> orderedNodeList = new List<NonInputNode>(unorderedNodes.Length);
+            List<NonInputNode> orderedNodeList = new List<NonInputNode>(unorderedNodes.Count);
 
-            bool[] nodesCalculated = new bool[numInputs + unorderedNodes.Length];
+            bool[] nodesCalculated = new bool[totalNodes];
             for (int i = 0; i < numInputs; i++)
                 nodesCalculated[i] = true;
             
@@ -81,12 +105,17 @@ namespace Tetris.NEAT
                     nodeQueue.Enqueue(candidateNode);
             }
             nonInputNodes = orderedNodeList.ToArray();
+
+            if(nonInputNodes.Where(node => node.number > (numInputs + numOutputs - 1) && node.sourceNodeNums.Count == 0).Count() > 0)
+            {
+                throw new InvalidOperationException();
+            }
         }
 
         public double[] FeedForward(double[] inputs)
         {
             //Activations are in the order (inputs, outputs, hidden nodes)
-            double[] activations = Enumerable.Repeat(ACTIVATION_NOT_CALCULATED, numInputs + nonInputNodes.Length).ToArray();
+            double[] activations = Enumerable.Repeat(ACTIVATION_NOT_CALCULATED, totalNodes).ToArray();
             //Input node activations are just the inputs
             inputs.CopyTo(activations, 0);
 

@@ -16,14 +16,14 @@ namespace Tetris
         /// </summary>
         /// <param name="noOfRows">The number of visible rows on the board</param>
         /// <param name="noOfColumns">The number of columns on the board</param>
-        public Board(int noOfRows, int noOfColumns, String blockSet)
+        public Board(int noOfRows, int noOfColumns, Random rand)
         {
             numColumns = noOfColumns;
             numVisibleRows = noOfRows;
             totalNumRows = noOfRows + numHiddenRows;
 
             board = new int[totalNumRows, numColumns];
-            blockSpawner = new BlockSpawner(blockSet);
+            blockSpawner = new BlockSpawner(rand);
 
             // initialise the board by setting each cell as the default color
             for (int row = 0; row < totalNumRows; row++)
@@ -53,7 +53,7 @@ namespace Tetris
         /// <summary>
         /// The default color of the board when there are no blocks there
         /// </summary>
-        int boardColor = Color.PeachPuff.ToArgb();
+        public int boardColor = Color.PeachPuff.ToArgb();
 
         /// <summary>
         /// The board that is being played on.
