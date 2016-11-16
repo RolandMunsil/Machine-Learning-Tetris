@@ -302,68 +302,74 @@ namespace Tetris.NEAT
             child.numInputs = parent1.numInputs;
             child.numOutputs = parent1.numOutputs;
 
-            //Sharedgenes
-            int maxSharedGenes = Math.Min(parent1.connectionGenes.Count, parent2.connectionGenes.Count);
-            int numSharedGenes = maxSharedGenes;
-            for (int j = 0; j < maxSharedGenes; j++)
+            int i1 = 0;
+            int i2 = 0;
+            while (true)
             {
-                ConnectionGene p1gene = parent1.connectionGenes[j];
-                ConnectionGene p2gene = parent2.connectionGenes[j];
-                if (p1gene.innovationNumber != p2gene.innovationNumber)
+                if (i1 == parent1.connectionGenes.Count) //The rest in parent2 are excess
                 {
-                    numSharedGenes = j;
+                    for(;i2 < parent2.connectionGenes.Count; i2++)
+                        PossiblyAdd(o2, o1, child, parent2.connectionGenes[i2]);
                     break;
                 }
-                else
+                if (i2 == parent2.connectionGenes.Count) // The rest in parent1 are excess
+                {
+                    for (; i1 < parent1.connectionGenes.Count; i1++)
+                        PossiblyAdd(o1, o2, child, parent1.connectionGenes[i1]);
+                    break;
+                }
+
+                ConnectionGene gene1 = parent1.connectionGenes[i1];
+                ConnectionGene gene2 = parent2.connectionGenes[i2];
+                if (gene1.innovationNumber < gene2.innovationNumber) //Only in org 1
+                {
+                    PossiblyAdd(o1, o2, child, gene1);
+                    i1++;
+                }
+                else if (gene2.innovationNumber < gene1.innovationNumber) //Only in org 2
+                {
+                    PossiblyAdd(o2, o1, child, gene2);
+                    i2++;
+                }
+                else //Shared gene
                 {
                     ConnectionGene newGene = new ConnectionGene();
-                    newGene.inNodeNum = p1gene.inNodeNum;
-                    newGene.outNodeNum = p1gene.outNodeNum;
-                    newGene.innovationNumber = p1gene.innovationNumber;
-                    newGene.enabled = (p1gene.enabled && p2gene.enabled) ? true : !(rand.NextDouble() < disabledIfEitherParentDisabledRate);
+                    newGene.inNodeNum = gene1.inNodeNum;
+                    newGene.outNodeNum = gene1.outNodeNum;
+                    newGene.innovationNumber = gene1.innovationNumber;
+                    newGene.enabled = (gene1.enabled && gene2.enabled) ? true : !(rand.NextDouble() < disabledIfEitherParentDisabledRate);
                     if (rand.NextDouble() < matingWeightAverageRate)
-                        newGene.weight = (p1gene.weight + p2gene.weight) / 2;
+                        newGene.weight = (gene1.weight + gene2.weight) / 2;
                     else
-                        newGene.weight = rand.NextDouble() < 0.5 ? p1gene.weight : p2gene.weight;
+                        newGene.weight = rand.NextDouble() < 0.5 ? gene1.weight : gene2.weight;
                     child.connectionGenes.Add(newGene);
+
+                    i1++;
+                    i2++;
                 }
             }
+            foreach(ConnectionGene gene in child.connectionGenes)
+            {
+                child.numHiddenNodes = Math.Max(child.numHiddenNodes, Math.Max(gene.inNodeNum, gene.outNodeNum));
+            }
+            return child;
+        }
 
-            //Other genes
+        private void PossiblyAdd(Organism o1, Organism o2, Genome child, ConnectionGene gene1)
+        {
             if (o1.fitness > o2.fitness)
             {
-                child.connectionGenes.AddRange(parent1.connectionGenes.Skip(numSharedGenes));
-                child.numHiddenNodes = parent1.numHiddenNodes;
+                if (!gene1.enabled)
+                    gene1.enabled = !(rand.NextDouble() < disabledIfEitherParentDisabledRate);
+                child.connectionGenes.Add(gene1);
             }
-            else if (o2.fitness > o1.fitness)
+            else if (o1.fitness == o2.fitness)
             {
-                child.connectionGenes.AddRange(parent2.connectionGenes.Skip(numSharedGenes));
-                child.numHiddenNodes = parent2.numHiddenNodes;
+                if (!gene1.enabled)
+                    gene1.enabled = !(rand.NextDouble() < disabledIfEitherParentDisabledRate);
+                if (rand.NextDouble() < 0.5)
+                    child.connectionGenes.Add(gene1);
             }
-            else //Equal, so add randomly
-            {
-                Queue<ConnectionGene> p1g = new Queue<ConnectionGene>(parent1.connectionGenes.Skip(numSharedGenes));
-                Queue<ConnectionGene> p2g = new Queue<ConnectionGene>(parent2.connectionGenes.Skip(numSharedGenes));
-                while (p1g.Count > 0 && p2g.Count > 0)
-                {
-                    ConnectionGene newGene;
-                    if (p1g.Count == 0)
-                        newGene = p2g.Dequeue();
-                    else if (p2g.Count == 0)
-                        newGene = p1g.Dequeue();
-                    else
-                    {
-                        newGene = p1g.Peek().innovationNumber > p2g.Peek().innovationNumber ?
-                                        p2g.Dequeue() :
-                                        p1g.Dequeue();
-                    }
-                    if (rand.NextDouble() < 0.5)
-                        child.connectionGenes.Add(newGene);
-                }
-                child.numHiddenNodes = Math.Max(parent1.numHiddenNodes, parent2.numHiddenNodes);
-            }
-
-            return child;
         }
 
         private void Mutate(Genome parentGenome)
@@ -461,6 +467,7 @@ namespace Tetris.NEAT
                 board.Tick();
                 ticksSurvived++;
             }
+            //return (int)(Math.Pow((ticksSurvived / baseTicksSurvived), 2) * baseTicksSurvived);
             return ticksSurvived;
         }
 

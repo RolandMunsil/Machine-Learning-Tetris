@@ -180,9 +180,6 @@ namespace Tetris
         /// <param name="row">The row to remove</param>
         private void DestroyRow(int rowToRemove)
         {
-            if (rowToRemove == 0)
-                throw new IndexOutOfRangeException();
-
             // start on the specified row and move up
             for (int row = rowToRemove; row > 0; row--)
             {
