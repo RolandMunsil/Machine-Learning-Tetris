@@ -41,15 +41,16 @@ namespace Tetris.NEAT
             }
 
             //Create nodes
-            foreach (ConnectionGene connection in genome.connectionGenes.Where(gene => gene.enabled))
+            foreach (ConnectionGene connection in genome.connectionGenes)
             {
-                int outNodeIndex = connection.outNodeNum - numInputs;
-                NonInputNode outNode = unorderedNodes[outNodeIndex];
+                if (connection.enabled)
+                {
+                    int outNodeIndex = connection.outNodeNum - numInputs;
+                    NonInputNode outNode = unorderedNodes[outNodeIndex];
 
-                outNode.sourceNodeNums.Add(connection.inNodeNum);
-                outNode.sourceNodeWeights.Add(connection.weight);
-                if (outNode.number != connection.outNodeNum)
-                    throw new Exception();
+                    outNode.sourceNodeNums.Add(connection.inNodeNum);
+                    outNode.sourceNodeWeights.Add(connection.weight);
+                }
             }
 
             //Recursively remove any nodes that have no inputs
@@ -104,10 +105,10 @@ namespace Tetris.NEAT
             }
             nonInputNodes = orderedNodeList.ToArray();
 
-            if(nonInputNodes.Where(node => node.number > (numInputs + numOutputs - 1) && node.sourceNodeNums.Count == 0).Count() > 0)
-            {
-                throw new InvalidOperationException();
-            }
+            //if(nonInputNodes.Where(node => node.number > (numInputs + numOutputs - 1) && node.sourceNodeNums.Count == 0).Count() > 0)
+            //{
+            //    throw new InvalidOperationException();
+            //}
         }
 
         public double[] FeedForward(double[] inputs)

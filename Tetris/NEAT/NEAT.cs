@@ -27,6 +27,7 @@ namespace Tetris.NEAT
         public readonly double c2 = 1;
         public readonly double c3 = 0.4;
         readonly double compatabilityThreshhold = 3.0;
+        readonly int generationsNoImprovementCutoff = 15;
         readonly double mutationRate = .25;
         readonly double mutateAddNewNodeRate = 0.03;
         readonly double mutateAddNewConnectionRate = 0.2;
@@ -176,18 +177,27 @@ namespace Tetris.NEAT
         {
             foreach(Species species in allSpecies)
             {
+                double maxFitness = 0;
                 foreach(Organism organism in species.members)
                 {
                     if(organism.originalFitness == -1)
                         organism.originalFitness = EvaluateNeuralNet(organism.neuralNet);
                     organism.fitness = organism.originalFitness / species.members.Count;
+                    maxFitness = Math.Max(maxFitness, organism.fitness);
+                }
+                if(maxFitness > species.maxFitnessLastImprovedGeneration)
+                {
+                    species.lastImprovedGeneration = currentGeneration;
+                    species.maxFitnessLastImprovedGeneration = maxFitness;
                 }
             }
         }
 
         public void MakeNextGeneration()
         {
-            //If a species has >5 members, the best organism should just be cloned.
+            //Remove any species that haven't improved
+            allSpecies.RemoveAll(s => currentGeneration - s.lastImprovedGeneration >= generationsNoImprovementCutoff);
+
             double totalAverageFitness = allSpecies.Sum(s => s.AverageFitness);
 
             double fracPartTotal = 0;
@@ -244,26 +254,25 @@ namespace Tetris.NEAT
                         //Pick parents
                         Organism o1 = RandElementOf(possibleParents);
                         Organism o2;
-                        //Don't do interspecies mating as all species do not share the same basic innovations
-                        //if (allSpecies.Count > 1 && rand.NextDouble() < interspeciesMateRate)
-                        //{
-                        //    //Pick a random organism from a random species.
-                        //    Species randSpec;
-                        //    do
-                        //    {
-                        //        randSpec = RandElementOf(allSpecies);
-                        //    }
-                        //    while (randSpec == species);
-                        //    o2 = RandElementOf(randSpec.members);
-                        //}
-                        //else
-                        //{
+                        if (allSpecies.Count > 1 && rand.NextDouble() < interspeciesMateRate)
+                        {
+                            //Pick a random organism from a random species.
+                            Species randSpec;
+                            do
+                            {
+                                randSpec = RandElementOf(allSpecies);
+                            }
+                            while (randSpec == species);
+                            o2 = RandElementOf(randSpec.members);
+                        }
+                        else
+                        {
                             do
                             {
                                 o2 = RandElementOf(possibleParents);
                             }
                             while (o1 == o2);
-                        //}
+                        }
 
                         //Now do the mating
                         Genome child = Mate(o1, o2);
@@ -426,6 +435,7 @@ namespace Tetris.NEAT
                 {
                     Species newSpecies = new Species(nextSpeciesNumber++, organism.genome);
                     newSpecies.members.Add(organism);
+                    newSpecies.lastImprovedGeneration = currentGeneration;
                     allSpecies.Add(newSpecies);
                 }
             }

@@ -13,11 +13,17 @@ namespace Tetris.NEAT
         public Genome representativeGenome;
         public List<Organism> members;
 
+        public int lastImprovedGeneration;
+        public double maxFitnessLastImprovedGeneration;
+
         public Species(int number, Genome representativeGenome)
         {
             this.speciesNumber = number;
             this.representativeGenome = representativeGenome;
             members = new List<Organism>();
+
+            lastImprovedGeneration = 0;
+            maxFitnessLastImprovedGeneration = 0;
         }
 
         public double AverageFitness
