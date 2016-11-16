@@ -133,8 +133,11 @@ namespace Tetris
             {
                 Coordinate coord = currentBlock.toBoardCoordinates(squareCoord);
                 // lock it into position on the board
-                lockedBlocksColors[coord.row, coord.col] = currentBlock.color;
-                this[coord.row, coord.col] = LOCKED_SQUARES;
+                if (coord.row >= 0)
+                {
+                    lockedBlocksColors[coord.row, coord.col] = currentBlock.color;
+                    this[coord.row, coord.col] = LOCKED_SQUARES;
+                }
             }
         }
 

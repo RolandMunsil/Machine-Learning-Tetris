@@ -213,7 +213,7 @@ namespace Tetris.NEAT
                 }
 
                 //Add the champ
-                if (species.members.Count > 5)
+                if (numOffspring > 0 && species.members.Count > 5)
                 {
                     Organism champion = species.members[0];
                     foreach (Organism member in species.members)
@@ -465,35 +465,23 @@ namespace Tetris.NEAT
         }
 
         internal void NetworkStep(NeuralNetwork network, Board board)
-        {
-            //double[] inputs = new double[numRows * numCols + 1];
-            //for (int row = 0; row < numRows; row++)
-            //{
-            //    for (int col = 0; col < numCols; col++)
-            //    {
-            //        int val = board[row, col];
-            //        inputs[row * numCols + col] = val;
-            //    }
-            //}
-            //Block block = board.currentBlock;
-            //for (int row = 0; row < block.squares.GetLength(0); row++)
-            //{
-            //    for (int col = 0; col < block.squares.GetLength(1); col++)
-            //    {
-            //        Coordinate coord = new Coordinate(row, col);
-            //        coord = block.toBoardCoordinates(coord);
-            //        if (block.squares[row, col] && coord.col >= 0 && coord.col < numCols
-            //                && coord.row >= board.numHiddenRows && coord.row < numRows + board.numHiddenRows)
-            //        {
-            //            inputs[(coord.row - board.numHiddenRows) * numCols + coord.col] = 1;
-            //        }
-            //    }
-            //}
-            //inputs[inputs.Length - 1] = 1; //Bias input
-            double[] inputs = board.board;
-            //TODO: add block
+        {           
+            //Put block squares onto board
+            foreach(Coordinate coord in board.currentBlock.squareCoords)
+            {
+                var c = board.currentBlock.toBoardCoordinates(coord);
+                if (c.row >= 0)
+                    board[c.row, c.col] = Board.BLOCK_SQUARES;
+            } 
+            double[] outputs = network.FeedForward(board.board);
+            //Take them back off
+            foreach (Coordinate coord in board.currentBlock.squareCoords)
+            {
+                var c = board.currentBlock.toBoardCoordinates(coord);
+                if(c.row >= 0)
+                    board[c.row, c.col] = Board.EMPTY_SPACE;
+            }
 
-            double[] outputs = network.FeedForward(inputs);
             bool triedMoveLeft = outputs[0] > .5;
             bool triedMoveRight = outputs[1] > .5;
             bool triedMoveDown = outputs[2] > .5;
