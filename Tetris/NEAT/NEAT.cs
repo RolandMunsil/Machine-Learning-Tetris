@@ -466,30 +466,32 @@ namespace Tetris.NEAT
 
         internal void NetworkStep(NeuralNetwork network, Board board)
         {
-            double[] inputs = new double[numRows * numCols + 1];
-            for (int row = 0; row < numRows; row++)
-            {
-                for (int col = 0; col < numCols; col++)
-                {
-                    int color = board.board[row + board.numHiddenRows, col];
-                    inputs[row * numCols + col] = color == board.boardColor ? 0 : -1;
-                }
-            }
-            Block block = board.currentBlock;
-            for (int row = 0; row < block.squares.GetLength(0); row++)
-            {
-                for (int col = 0; col < block.squares.GetLength(1); col++)
-                {
-                    Coordinate coord = new Coordinate(row, col);
-                    coord = block.toBoardCoordinates(coord);
-                    if (block.squares[row, col] && coord.col >= 0 && coord.col < numCols
-                            && coord.row >= board.numHiddenRows && coord.row < numRows + board.numHiddenRows)
-                    {
-                        inputs[(coord.row - board.numHiddenRows) * numCols + coord.col] = 1;
-                    }
-                }
-            }
-            inputs[inputs.Length - 1] = 1; //Bias input
+            //double[] inputs = new double[numRows * numCols + 1];
+            //for (int row = 0; row < numRows; row++)
+            //{
+            //    for (int col = 0; col < numCols; col++)
+            //    {
+            //        int val = board[row, col];
+            //        inputs[row * numCols + col] = val;
+            //    }
+            //}
+            //Block block = board.currentBlock;
+            //for (int row = 0; row < block.squares.GetLength(0); row++)
+            //{
+            //    for (int col = 0; col < block.squares.GetLength(1); col++)
+            //    {
+            //        Coordinate coord = new Coordinate(row, col);
+            //        coord = block.toBoardCoordinates(coord);
+            //        if (block.squares[row, col] && coord.col >= 0 && coord.col < numCols
+            //                && coord.row >= board.numHiddenRows && coord.row < numRows + board.numHiddenRows)
+            //        {
+            //            inputs[(coord.row - board.numHiddenRows) * numCols + coord.col] = 1;
+            //        }
+            //    }
+            //}
+            //inputs[inputs.Length - 1] = 1; //Bias input
+            double[] inputs = board.board;
+            //TODO: add block
 
             double[] outputs = network.FeedForward(inputs);
             bool triedMoveLeft = outputs[0] > .5;

@@ -40,12 +40,11 @@ namespace Tetris
         /// <summary>
         /// The color of the square
         /// </summary>
-        public int color
+        public Color Color
         {
             set
             {
-                // this.color = value;
-                this.BackColor = Color.FromArgb(value);
+                this.BackColor = value;
             }
         }
     }

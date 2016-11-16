@@ -113,18 +113,17 @@ namespace Tetris.NEAT
         public double[] FeedForward(double[] inputs)
         {
             //Activations are in the order (inputs, outputs, hidden nodes)
-            double[] activations = Enumerable.Repeat(Double.NaN, totalNodes - numInputs).ToArray();
-            //Input node activations are just the inputs
-            //inputs.CopyTo(activations, 0);
+            //double[] activations = Enumerable.Repeat(Double.NaN, totalNodes - numInputs).ToArray();
+            double[] activations = new double[totalNodes - numInputs];
 
             //NOTE: nodes are already in an order such that when we get to a node,
             //all of its source activations will have been calculated.
-            for(int i = 0; i < nonInputNodes.Length; i++)
+            for (int i = 0; i < nonInputNodes.Length; i++)
             {
                 NonInputNode node = nonInputNodes[i];
                 int activationIndex = node.number - numInputs;
-                if (!Double.IsNaN(activations[activationIndex]))
-                    throw new InvalidOperationException();
+                //if (!Double.IsNaN(activations[activationIndex]))
+                //    throw new InvalidOperationException();
 
                 // Dot product
                 activations[activationIndex] = 0;
@@ -139,10 +138,10 @@ namespace Tetris.NEAT
                 }
                 activations[activationIndex] = ActivationFunc(activations[activationIndex]);
 
-                if(Double.IsNaN(activations[activationIndex]))
-                {
-                    throw new InvalidOperationException("Nodes are not in a correct order.");
-                }
+                //if(Double.IsNaN(activations[activationIndex]))
+                //{
+                //    throw new InvalidOperationException("Nodes are not in a correct order.");
+                //}
             }
             //Take outputs from the end
             double[] outputs = activations.Take(numOutputs).ToArray();

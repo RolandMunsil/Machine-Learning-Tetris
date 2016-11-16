@@ -19,16 +19,18 @@ namespace Tetris
         public Board(int noOfRows, int noOfColumns, Random rand)
         {
             numColumns = noOfColumns;
-            numVisibleRows = noOfRows;
-            totalNumRows = noOfRows + numHiddenRows;
+            numRows = noOfRows;
 
-            board = new int[totalNumRows, numColumns];
+            board = new double[numRows * numColumns + 1]; //+1 for bias
+            lockedBlocksColors = new Color[numRows, numColumns];
             blockSpawner = new BlockSpawner(rand);
 
             // initialise the board by setting each cell as the default color
-            for (int row = 0; row < totalNumRows; row++)
-                for (int col = 0; col < numColumns; col++)
-                    board[row, col] = boardColor;
+            for(int i = 0; i < board.Length - 1; i++)
+            {
+                board[i] = EMPTY_SPACE;
+            }
+            board[board.Length - 1] = 1;
 
             SpawnBlock();
         }
@@ -50,16 +52,17 @@ namespace Tetris
         /// </summary>
         public int score = 0;
 
-        /// <summary>
-        /// The default color of the board when there are no blocks there
-        /// </summary>
-        public int boardColor = Color.PeachPuff.ToArgb();
+        public const double BLOCK_SQUARES = 1;
+        public const double EMPTY_SPACE = 0;
+        public const double LOCKED_SQUARES = -1;
 
         /// <summary>
         /// The board that is being played on.
-        /// board[row, col]. (0, 0) is the upper left.
+        /// board[row * numColumns + col]. (0, 0) is the upper left.
         /// </summary>
-        public int[,] board;
+        public double[] board;
+
+        public Color[,] lockedBlocksColors;
 
         /// <summary>
         /// The block that is currently being played
@@ -72,23 +75,19 @@ namespace Tetris
         int numColumns;
 
         /// <summary>
-        /// The number of rows that are hidden above the top of the grid
-        /// </summary>
-        public readonly int numHiddenRows = 2;
-
-        /// <summary>
         /// The number of rows on the board
         /// </summary>
-        int numVisibleRows;
-
-        /// <summary>
-        /// The total number of rows on the board
-        /// </summary>
-        int totalNumRows;
+        int numRows;
 
         public bool hasLost = false;
 
         #endregion variables
+
+        public double this[int row, int col]
+        {
+            get { return board[row * numColumns + col]; }
+            set { board[row * numColumns + col] = value;  }
+        }
 
         /// <summary>
         /// Ticks the board forward one move
@@ -121,7 +120,7 @@ namespace Tetris
         {
             // spawn a new block
             currentBlock = blockSpawner.Next();
-            currentBlock.topLeft.row = numHiddenRows - 2;
+            currentBlock.topLeft.row = -2;
             currentBlock.topLeft.col = (numColumns - currentBlock.squares.GetLength(1)) / 2;
         }
 
@@ -140,7 +139,8 @@ namespace Tetris
                     {
                         Coordinate coord = currentBlock.toBoardCoordinates(new Coordinate(row, col));
                         // lock it into position on the board
-                        board[coord.row, coord.col] = currentBlock.color.ToArgb();
+                        lockedBlocksColors[coord.row, coord.col] = currentBlock.color;
+                        this[coord.row, coord.col] = LOCKED_SQUARES;
                     }
                 }
             }
@@ -155,7 +155,7 @@ namespace Tetris
         {
             int rowsDestroyedStart = rowsDestroyed;
 
-            for (int row = numHiddenRows; row < totalNumRows; row++)
+            for (int row = 0; row < numRows; row++)
             {
                 if (RowIsFull(row))
                     DestroyRow(row);
@@ -173,7 +173,7 @@ namespace Tetris
         private Boolean RowIsFull(int row)
         {
             for (int col = 0; col < numColumns; col++)
-                if (board[row, col] == boardColor)
+                if (this[row, col] == EMPTY_SPACE)
                     return false;
 
             return true;
@@ -195,7 +195,7 @@ namespace Tetris
                 for (int col = 0; col < numColumns; col++)
                 {
                     // and overwriting the current position with the one above
-                    board[row, col] = board[row - 1, col];
+                    this[row, col] = this[row - 1, col];
                 }
             }
 
@@ -278,8 +278,10 @@ namespace Tetris
                         // check to see if there's something already here
                         Coordinate coord = block.toBoardCoordinates(new Coordinate(row, col));
 
+                        if (coord.row < 0) continue;
+
                         if (coord.col >= numColumns || coord.col < 0 || 
-                            coord.row >= totalNumRows || board[coord.row, coord.col] != boardColor)
+                            coord.row >= numRows || this[coord.row, coord.col] != EMPTY_SPACE)
                         {
                             return false;
                         }

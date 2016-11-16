@@ -146,7 +146,14 @@ namespace Tetris
             {
                 for (int col = 0; col < numberOfColumns; col++)
                 {
-                    squares[row, col].color = board.board[row + board.numHiddenRows, col];
+                    if (board[row, col] == Board.LOCKED_SQUARES)
+                    {
+                        squares[row, col].Color = board.lockedBlocksColors[row, col];
+                    }
+                    else
+                    {
+                        squares[row, col].Color = Color.PeachPuff;
+                    }
                 }
             }
 
@@ -159,9 +166,9 @@ namespace Tetris
                     Coordinate coord = new Coordinate(row, col);
                     coord = block.toBoardCoordinates(coord);
                     if (block.squares[row, col] && coord.col >= 0 && coord.col < numberOfColumns
-                            && coord.row >= board.numHiddenRows && coord.row < numberOfRows + board.numHiddenRows)
+                            && coord.row >= 0 && coord.row < numberOfRows)
                     {
-                        squares[coord.row - board.numHiddenRows, coord.col].color = block.color.ToArgb();
+                        squares[coord.row, coord.col].Color = block.color;
                     }
                 }
             }
