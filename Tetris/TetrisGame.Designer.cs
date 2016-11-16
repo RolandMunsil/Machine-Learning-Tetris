@@ -48,22 +48,13 @@
             this.organismLabel = new System.Windows.Forms.Label();
             this.speciesLabel = new System.Windows.Forms.Label();
             this.genLabel = new System.Windows.Forms.Label();
-            this.sqSizeSelect = new System.Windows.Forms.NumericUpDown();
-            this.sqSizeLabel = new System.Windows.Forms.Label();
-            this.boardColsSelect = new System.Windows.Forms.NumericUpDown();
-            this.boardRowsSelect = new System.Windows.Forms.NumericUpDown();
-            this.boardColsLabel = new System.Windows.Forms.Label();
-            this.boardRowsLabel = new System.Windows.Forms.Label();
-            this.textBox2 = new System.Windows.Forms.TextBox();
             this.score = new System.Windows.Forms.Label();
             this.tickTimer = new System.Windows.Forms.Timer(this.components);
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.tableLayout.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.gameWindow.SuspendLayout();
             this.upcomingBlocks.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.sqSizeSelect)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.boardColsSelect)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.boardRowsSelect)).BeginInit();
             this.SuspendLayout();
             // 
             // tableLayout
@@ -71,7 +62,7 @@
             this.tableLayout.ColumnCount = 3;
             this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 84.28835F));
             this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15.71165F));
-            this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 183F));
+            this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 184F));
             this.tableLayout.Controls.Add(this.learnButton, 2, 2);
             this.tableLayout.Controls.Add(this.scoreLabel, 0, 5);
             this.tableLayout.Controls.Add(this.menuStrip, 0, 0);
@@ -112,7 +103,7 @@
             // 
             this.scoreLabel.AutoSize = true;
             this.scoreLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.scoreLabel.Location = new System.Drawing.Point(1100, 724);
+            this.scoreLabel.Location = new System.Drawing.Point(1099, 724);
             this.scoreLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.scoreLabel.Name = "scoreLabel";
             this.scoreLabel.Size = new System.Drawing.Size(89, 29);
@@ -150,10 +141,10 @@
             // 
             this.tableLayout.SetColumnSpan(this.newGameButton, 2);
             this.newGameButton.Dock = System.Windows.Forms.DockStyle.Top;
-            this.newGameButton.Location = new System.Drawing.Point(1100, 587);
+            this.newGameButton.Location = new System.Drawing.Point(1099, 587);
             this.newGameButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.newGameButton.Name = "newGameButton";
-            this.newGameButton.Size = new System.Drawing.Size(380, 35);
+            this.newGameButton.Size = new System.Drawing.Size(381, 35);
             this.newGameButton.TabIndex = 3;
             this.newGameButton.Text = "New Game";
             this.newGameButton.UseVisualStyleBackColor = true;
@@ -163,7 +154,7 @@
             // 
             this.rowsClearedLabel.AutoSize = true;
             this.rowsClearedLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rowsClearedLabel.Location = new System.Drawing.Point(1100, 672);
+            this.rowsClearedLabel.Location = new System.Drawing.Point(1099, 672);
             this.rowsClearedLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.rowsClearedLabel.Name = "rowsClearedLabel";
             this.rowsClearedLabel.Size = new System.Drawing.Size(85, 29);
@@ -174,7 +165,7 @@
             // 
             this.rowsCleared.AutoSize = true;
             this.rowsCleared.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rowsCleared.Location = new System.Drawing.Point(1304, 672);
+            this.rowsCleared.Location = new System.Drawing.Point(1303, 672);
             this.rowsCleared.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.rowsCleared.Name = "rowsCleared";
             this.rowsCleared.Size = new System.Drawing.Size(27, 29);
@@ -192,7 +183,7 @@
             this.gameWindow.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.gameWindow.Name = "gameWindow";
             this.tableLayout.SetRowSpan(this.gameWindow, 5);
-            this.gameWindow.Size = new System.Drawing.Size(1088, 755);
+            this.gameWindow.Size = new System.Drawing.Size(1087, 755);
             this.gameWindow.TabIndex = 6;
             // 
             // rotateOutputLabel
@@ -250,22 +241,16 @@
             // upcomingBlocks
             // 
             this.tableLayout.SetColumnSpan(this.upcomingBlocks, 2);
+            this.upcomingBlocks.Controls.Add(this.textBox1);
             this.upcomingBlocks.Controls.Add(this.fitnessLabel);
             this.upcomingBlocks.Controls.Add(this.organismLabel);
             this.upcomingBlocks.Controls.Add(this.speciesLabel);
             this.upcomingBlocks.Controls.Add(this.genLabel);
-            this.upcomingBlocks.Controls.Add(this.sqSizeSelect);
-            this.upcomingBlocks.Controls.Add(this.sqSizeLabel);
-            this.upcomingBlocks.Controls.Add(this.boardColsSelect);
-            this.upcomingBlocks.Controls.Add(this.boardRowsSelect);
-            this.upcomingBlocks.Controls.Add(this.boardColsLabel);
-            this.upcomingBlocks.Controls.Add(this.boardRowsLabel);
-            this.upcomingBlocks.Controls.Add(this.textBox2);
             this.upcomingBlocks.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.upcomingBlocks.Location = new System.Drawing.Point(1100, 46);
+            this.upcomingBlocks.Location = new System.Drawing.Point(1099, 46);
             this.upcomingBlocks.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.upcomingBlocks.Name = "upcomingBlocks";
-            this.upcomingBlocks.Size = new System.Drawing.Size(380, 531);
+            this.upcomingBlocks.Size = new System.Drawing.Size(381, 531);
             this.upcomingBlocks.TabIndex = 7;
             // 
             // fitnessLabel
@@ -312,119 +297,11 @@
             this.genLabel.TabIndex = 14;
             this.genLabel.Text = "Generation";
             // 
-            // sqSizeSelect
-            // 
-            this.sqSizeSelect.Location = new System.Drawing.Point(177, 471);
-            this.sqSizeSelect.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.sqSizeSelect.Maximum = new decimal(new int[] {
-            40,
-            0,
-            0,
-            0});
-            this.sqSizeSelect.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.sqSizeSelect.Name = "sqSizeSelect";
-            this.sqSizeSelect.ReadOnly = true;
-            this.sqSizeSelect.Size = new System.Drawing.Size(102, 26);
-            this.sqSizeSelect.TabIndex = 13;
-            this.sqSizeSelect.Value = new decimal(new int[] {
-            20,
-            0,
-            0,
-            0});
-            // 
-            // sqSizeLabel
-            // 
-            this.sqSizeLabel.AutoSize = true;
-            this.sqSizeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.sqSizeLabel.Location = new System.Drawing.Point(0, 471);
-            this.sqSizeLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.sqSizeLabel.Name = "sqSizeLabel";
-            this.sqSizeLabel.Size = new System.Drawing.Size(162, 29);
-            this.sqSizeLabel.TabIndex = 12;
-            this.sqSizeLabel.Text = "Square Size:";
-            // 
-            // boardColsSelect
-            // 
-            this.boardColsSelect.Location = new System.Drawing.Point(177, 425);
-            this.boardColsSelect.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.boardColsSelect.Maximum = new decimal(new int[] {
-            50,
-            0,
-            0,
-            0});
-            this.boardColsSelect.Minimum = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            this.boardColsSelect.Name = "boardColsSelect";
-            this.boardColsSelect.ReadOnly = true;
-            this.boardColsSelect.Size = new System.Drawing.Size(102, 26);
-            this.boardColsSelect.TabIndex = 11;
-            this.boardColsSelect.Value = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            // 
-            // boardRowsSelect
-            // 
-            this.boardRowsSelect.Location = new System.Drawing.Point(177, 375);
-            this.boardRowsSelect.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.boardRowsSelect.Minimum = new decimal(new int[] {
-            20,
-            0,
-            0,
-            0});
-            this.boardRowsSelect.Name = "boardRowsSelect";
-            this.boardRowsSelect.ReadOnly = true;
-            this.boardRowsSelect.Size = new System.Drawing.Size(102, 26);
-            this.boardRowsSelect.TabIndex = 10;
-            this.boardRowsSelect.Value = new decimal(new int[] {
-            20,
-            0,
-            0,
-            0});
-            // 
-            // boardColsLabel
-            // 
-            this.boardColsLabel.AutoSize = true;
-            this.boardColsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.boardColsLabel.Location = new System.Drawing.Point(0, 425);
-            this.boardColsLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.boardColsLabel.Name = "boardColsLabel";
-            this.boardColsLabel.Size = new System.Drawing.Size(150, 29);
-            this.boardColsLabel.TabIndex = 9;
-            this.boardColsLabel.Text = "Board Cols:";
-            // 
-            // boardRowsLabel
-            // 
-            this.boardRowsLabel.AutoSize = true;
-            this.boardRowsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.boardRowsLabel.Location = new System.Drawing.Point(0, 375);
-            this.boardRowsLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.boardRowsLabel.Name = "boardRowsLabel";
-            this.boardRowsLabel.Size = new System.Drawing.Size(162, 29);
-            this.boardRowsLabel.TabIndex = 8;
-            this.boardRowsLabel.Text = "Board Rows:";
-            // 
-            // textBox2
-            // 
-            this.textBox2.Location = new System.Drawing.Point(131, 323);
-            this.textBox2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(148, 26);
-            this.textBox2.TabIndex = 1;
-            // 
             // score
             // 
             this.score.AutoSize = true;
             this.score.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.score.Location = new System.Drawing.Point(1304, 724);
+            this.score.Location = new System.Drawing.Point(1303, 724);
             this.score.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.score.Name = "score";
             this.score.Size = new System.Drawing.Size(27, 29);
@@ -435,6 +312,14 @@
             // 
             this.tickTimer.Interval = 500;
             this.tickTimer.Tick += new System.EventHandler(this.tickTimer_Tick);
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(18, 216);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(343, 297);
+            this.textBox1.TabIndex = 18;
             // 
             // TetrisGame
             // 
@@ -455,9 +340,6 @@
             this.gameWindow.ResumeLayout(false);
             this.upcomingBlocks.ResumeLayout(false);
             this.upcomingBlocks.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.sqSizeSelect)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.boardColsSelect)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.boardRowsSelect)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -475,13 +357,6 @@
         private System.Windows.Forms.Label rowsClearedLabel;
         private System.Windows.Forms.Label rowsCleared;
         private System.Windows.Forms.Panel upcomingBlocks;
-        private System.Windows.Forms.NumericUpDown sqSizeSelect;
-        private System.Windows.Forms.Label sqSizeLabel;
-        private System.Windows.Forms.NumericUpDown boardColsSelect;
-        private System.Windows.Forms.NumericUpDown boardRowsSelect;
-        private System.Windows.Forms.Label boardColsLabel;
-        private System.Windows.Forms.Label boardRowsLabel;
-        private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.Label score;
         private System.Windows.Forms.Button learnButton;
         private System.Windows.Forms.Label fitnessLabel;
@@ -492,6 +367,7 @@
         private System.Windows.Forms.Label downOutputLabel;
         private System.Windows.Forms.Label rightOutputLabel;
         private System.Windows.Forms.Label leftOutputLabel;
+        private System.Windows.Forms.TextBox textBox1;
     }
 }
 

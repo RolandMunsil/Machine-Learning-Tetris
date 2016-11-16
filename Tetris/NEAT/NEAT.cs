@@ -19,7 +19,7 @@ namespace Tetris.NEAT
         //http://stackoverflow.com/questions/31708478/how-to-evolve-weights-of-a-neural-network-in-neuroevolution
 
         readonly int populationSize = 1000;
-        readonly int genZeroSpeciesSize = 5;
+        readonly int genZeroSpeciesSize = 1;
         readonly int minGenZeroConnections = 2;
         readonly int maxGenZeroConnections = 4;
         readonly double chanceOfGenZeroAddNode = .1;
@@ -57,7 +57,7 @@ namespace Tetris.NEAT
 
         public NEAT()
         {
-            rand = new Random(0);
+            rand = new Random();
             randNorm = new MathNet.Numerics.Distributions.Normal(rand);
             connectionInnovations = new Dictionary<Tuple<int, int>, int>();
             addNodeInnovations = new Dictionary<int, int>();

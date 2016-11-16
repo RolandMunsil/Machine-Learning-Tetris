@@ -73,17 +73,8 @@ namespace Tetris
         /// </summary>
         private void ResetGame()
         {
-            bool boardPropertiesChanged = squareDimensions != (int)sqSizeSelect.Value ||
-                                              numberOfRows != (int)boardRowsSelect.Value ||
-                                           numberOfColumns != (int)boardColsSelect.Value;
-            if (boardPropertiesChanged)
-            {
-                squareDimensions = (int)sqSizeSelect.Value;
-                numberOfRows = (int)boardRowsSelect.Value;
-                numberOfColumns = (int)boardColsSelect.Value;
-                if (showUIWhenPlaying)
-                    CreateSquares();
-            }
+            if (showUIWhenPlaying)
+                CreateSquares();
             board = new Board(numberOfRows, numberOfColumns, new Random());
             
             if (showUIWhenPlaying)
@@ -274,9 +265,10 @@ namespace Tetris
             neat.MakeGenerationZero();
             neat.EvaluateGeneration();
 
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 40; i++)
             {
                 neat.MakeNextGeneration();
+                textBox1.Invoke(new Action(() => textBox1.AppendText($"Generation {neat.currentGeneration}\r\n")));
                 neat.EvaluateGeneration();
             }
             SetText(genLabel, $"Generation {neat.currentGeneration}");
