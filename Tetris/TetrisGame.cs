@@ -159,17 +159,13 @@ namespace Tetris
 
             // then display the current block
             Block block = board.currentBlock; // cache the block to make the code read a bit better
-            for (int row = 0; row < block.squares.GetLength(0); row++)
+            foreach (Coordinate squareCoord in board.currentBlock.squareCoords)
             {
-                for (int col = 0; col < block.squares.GetLength(1); col++)
+                Coordinate coord = block.toBoardCoordinates(squareCoord);
+                if (coord.col >= 0 && coord.col < numberOfColumns
+                        && coord.row >= 0 && coord.row < numberOfRows)
                 {
-                    Coordinate coord = new Coordinate(row, col);
-                    coord = block.toBoardCoordinates(coord);
-                    if (block.squares[row, col] && coord.col >= 0 && coord.col < numberOfColumns
-                            && coord.row >= 0 && coord.row < numberOfRows)
-                    {
-                        squares[coord.row, coord.col].Color = block.color;
-                    }
+                    squares[coord.row, coord.col].Color = block.color;
                 }
             }
 

@@ -17,12 +17,11 @@ namespace Tetris
         public Color color;
 
         /// <summary>
-        /// The position of squares and blanks within the block.
-        /// squares[row, col].
-        /// Not consistent with the board, but it makes the visualisations for
-        /// the starting positions clearer.
+        /// The coordinates of the squares of the block relative to topLeft
         /// </summary>
-        public Boolean[,] squares;
+        public Coordinate[] squareCoords;
+
+        public int boundingSquareSize;
 
         public Coordinate topLeft;
 
@@ -32,7 +31,9 @@ namespace Tetris
         /// <param name="positionSpawner">The type of the block</param>
         public Block(BlockType blockType)
         {
-            squares = blockType.shape;
+            squareCoords = new Coordinate[blockType.squareCoords.Length];
+            Array.Copy(blockType.squareCoords, squareCoords, blockType.squareCoords.Length);
+            boundingSquareSize = blockType.boundingSquareSize;
             color = blockType.color;
             topLeft = new Coordinate(-1, -1);
         }
@@ -44,6 +45,7 @@ namespace Tetris
         private Block(Block original)
         {
             //this.squares = (bool[,])original.squares.Clone();
+            this.boundingSquareSize = original.boundingSquareSize;
             this.color = original.color;
             this.topLeft = new Coordinate(original.topLeft.row, original.topLeft.col);
         }
@@ -54,10 +56,7 @@ namespace Tetris
         /// <returns></returns>
         public Coordinate toBoardCoordinates(Coordinate coord)
         {
-            coord.col += topLeft.col;
-            coord.row += topLeft.row;
-
-            return coord;
+            return new Coordinate(coord.row + topLeft.row, coord.col + topLeft.col);
         }
 
         /// <summary>
@@ -65,23 +64,14 @@ namespace Tetris
         /// </summary>
         public Block RotatedClockwise()
         {
-            return RotatedAntiClockwise().RotatedAntiClockwise().RotatedAntiClockwise();
-        }
-
-        /// <summary>
-        /// Returns the block rotated anti-clockwise
-        /// </summary>
-        public Block RotatedAntiClockwise()
-        {
             Block copy = new Block(this);
+            copy.squareCoords = new Coordinate[squareCoords.Length];
 
-            // would be quicker to use matrices, but thinking is hard ;P
-            copy.squares = new Boolean[squares.GetLength(0), squares.GetLength(1)];
-
-            // works for squares of size 4x4, so hopefully also works for bigger ones
-            for (int row = 0; row < squares.GetLength(0); row++)
-                for (int col = 0; col < squares.GetLength(1); col++)
-                    copy.squares[squares.GetLength(1) - 1 - col, row] = squares[row, col];
+            for (int i = 0; i < squareCoords.Length; i++)
+            {
+                Coordinate orig = squareCoords[i];
+                copy.squareCoords[i] = new Coordinate(orig.col, (boundingSquareSize - 1) - orig.row);
+            }
 
             return copy;
         }

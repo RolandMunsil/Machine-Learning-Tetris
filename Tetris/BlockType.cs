@@ -13,9 +13,11 @@ namespace Tetris
     class BlockType
     {
         /// <summary>
-        /// The shape of the block
+        /// The coordinates of the squares of the block
         /// </summary>
-        public Boolean[,] shape;
+        public Coordinate[] squareCoords;
+
+        public int boundingSquareSize;
 
         /// <summary>
         /// The color of the block - regulations specify that different shapes are different colors

@@ -60,52 +60,87 @@ namespace Tetris
             BlockType[] types = new BlockType[7];
             // straight across in a line
             types[0] = new BlockType();
-            types[0].shape = new Boolean[,]
-                                        {{false, false, false, false},
-                                        {false, false, false, false},
-                                        {true, true, true, true},
-                                        {false, false, false, false}};
+            types[0].boundingSquareSize = 4;
+            types[0].squareCoords = new[] {new Coordinate(2, 0),
+                                           new Coordinate(2, 1),
+                                           new Coordinate(2, 2),
+                                           new Coordinate(2, 3)};
+            //types[0].shape = new Boolean[,]
+            //                            {{false, false, false, false},
+            //                            {false, false, false, false},
+            //                            {true, true, true, true},
+            //                            {false, false, false, false}};
             types[0].color = Color.Cyan;
             // L with a spike on the left
             types[1] = new BlockType();
-            types[1].shape = new Boolean[,]
-                                        {{true, false, false},
-                                         {true, true, true},
-                                         {false, false, false}};
+            types[1].boundingSquareSize = 3;
+            types[1].squareCoords = new[] {new Coordinate(0, 0),
+                                           new Coordinate(1, 0),
+                                           new Coordinate(1, 1),
+                                           new Coordinate(1, 2)};
+            //types[1].shape = new Boolean[,]
+            //                            {{true, false, false},
+            //                             {true, true, true},
+            //                             {false, false, false}};
             types[1].color = Color.Blue;
             // L with a spike on the right
             types[2] = new BlockType();
-            types[2].shape = new Boolean[,]
-                                        {{false, false, true},
-                                         {true, true, true},
-                                         {false, false, false}};
+            types[2].boundingSquareSize = 3;
+            types[2].squareCoords = new[] {new Coordinate(0, 2),
+                                           new Coordinate(1, 0),
+                                           new Coordinate(1, 1),
+                                           new Coordinate(1, 2)};
+            //types[2].shape = new Boolean[,]
+            //                            {{false, false, true},
+            //                             {true, true, true},
+            //                             {false, false, false}};
             types[2].color = Color.Orange;
             // square
             types[3] = new BlockType();
-            types[3].shape = new Boolean[,]
-                                        {{true, true},
-                                        {true, true}};
+            types[3].boundingSquareSize = 2;
+            types[3].squareCoords = new[] {new Coordinate(0, 0),
+                                           new Coordinate(1, 0),
+                                           new Coordinate(0, 1),
+                                           new Coordinate(1, 1)};
+            //types[3].shape = new Boolean[,]
+            //                            {{true, true},
+            //                            {true, true}};
             types[3].color = Color.Yellow;
             // zig-zag up to the right
             types[4] = new BlockType();
-            types[4].shape = new Boolean[,]
-                                        {{false, false, false},
-                                        {false, true, true},
-                                        {true, true, false}};
+            types[4].boundingSquareSize = 3;
+            types[4].squareCoords = new[] {new Coordinate(2, 0),
+                                           new Coordinate(2, 1),
+                                           new Coordinate(1, 1),
+                                           new Coordinate(1, 2)};
+            //types[4].shape = new Boolean[,]
+            //                            {{false, false, false},
+            //                            {false, true, true},
+            //                            {true, true, false}};
             types[4].color = Color.Red;
             // zig-zag up to the left
             types[5] = new BlockType();
-            types[5].shape = new Boolean[,]
-                                        {{false, false, false},
-                                        {true, true, false},
-                                        {false, true, true}};
+            types[5].boundingSquareSize = 3;
+            types[5].squareCoords = new[] {new Coordinate(1, 0),
+                                           new Coordinate(1, 1),
+                                           new Coordinate(2, 1),
+                                           new Coordinate(2, 2)};
+            //types[5].shape = new Boolean[,]
+            //                            {{false, false, false},
+            //                            {true, true, false},
+            //                            {false, true, true}};
             types[5].color = Color.Green;
             // T shape
             types[6] = new BlockType();
-            types[6].shape = new Boolean[,]
-                                        {{false, true, false},
-                                        {true, true, true},
-                                        {false, false, false}};
+            types[6].boundingSquareSize = 3;
+            types[6].squareCoords = new[] {new Coordinate(1, 0),
+                                           new Coordinate(1, 1),
+                                           new Coordinate(1, 2),
+                                           new Coordinate(0, 1)};
+            //types[6].shape = new Boolean[,]
+            //                            {{false, true, false},
+            //                            {true, true, true},
+            //                            {false, false, false}};
             types[6].color = Color.Purple;
             return types;
         }

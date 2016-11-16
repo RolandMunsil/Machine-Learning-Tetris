@@ -120,8 +120,7 @@ namespace Tetris
         {
             // spawn a new block
             currentBlock = blockSpawner.Next();
-            currentBlock.topLeft.row = -2;
-            currentBlock.topLeft.col = (numColumns - currentBlock.squares.GetLength(1)) / 2;
+            currentBlock.topLeft = new Coordinate(-2, (numColumns - currentBlock.boundingSquareSize) / 2);
         }
 
         /// <summary>
@@ -130,19 +129,12 @@ namespace Tetris
         private void LockBlock()
         {
             // loop through each of the squares within the current block
-            for (int row = 0; row < currentBlock.squares.GetLength(0); row++)
+            foreach(Coordinate squareCoord in currentBlock.squareCoords)
             {
-                for (int col = 0; col < currentBlock.squares.GetLength(1); col++)
-                {
-                    // if there's something there
-                    if (currentBlock.squares[row, col])
-                    {
-                        Coordinate coord = currentBlock.toBoardCoordinates(new Coordinate(row, col));
-                        // lock it into position on the board
-                        lockedBlocksColors[coord.row, coord.col] = currentBlock.color;
-                        this[coord.row, coord.col] = LOCKED_SQUARES;
-                    }
-                }
+                Coordinate coord = currentBlock.toBoardCoordinates(squareCoord);
+                // lock it into position on the board
+                lockedBlocksColors[coord.row, coord.col] = currentBlock.color;
+                this[coord.row, coord.col] = LOCKED_SQUARES;
             }
         }
 
@@ -268,24 +260,17 @@ namespace Tetris
         private Boolean CanBeHere(Block block)
         {
             // loop through each of the squares within the current block
-            for (int col = 0; col < block.squares.GetLength(0); col++)
+            foreach (Coordinate squareCoord in block.squareCoords)
             {
-                for (int row = 0; row < block.squares.GetLength(1); row++)
+                // check to see if there's something already here
+                Coordinate coord = block.toBoardCoordinates(squareCoord);
+
+                if (coord.row < 0) continue;
+
+                if (coord.col >= numColumns || coord.col < 0 || 
+                    coord.row >= numRows || this[coord.row, coord.col] != EMPTY_SPACE)
                 {
-                    // if there's something there
-                    if (block.squares[row, col])
-                    {
-                        // check to see if there's something already here
-                        Coordinate coord = block.toBoardCoordinates(new Coordinate(row, col));
-
-                        if (coord.row < 0) continue;
-
-                        if (coord.col >= numColumns || coord.col < 0 || 
-                            coord.row >= numRows || this[coord.row, coord.col] != EMPTY_SPACE)
-                        {
-                            return false;
-                        }
-                    }
+                    return false;
                 }
             }
 
