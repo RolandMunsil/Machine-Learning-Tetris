@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Tetris.NEAT
 {
-    class Organism
+    public class Organism
     {
         public NeuralNetwork neuralNet;
         public Genome genome;

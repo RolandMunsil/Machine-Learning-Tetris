@@ -271,13 +271,13 @@ namespace Tetris
             neat.MakeGenerationZero();
             neat.EvaluateGeneration();
 
-            //for(int i = 0; i < 5; i++)
-            //{
-            //    neat.MakeNextGeneration();
-            //    neat.EvaluateGeneration();
-            //}
+            for (int i = 0; i < 20; i++)
+            {
+                neat.MakeNextGeneration();
+                neat.EvaluateGeneration();
+            }
             SetText(genLabel, $"Generation {neat.currentGeneration}");
-            foreach (Species species in neat.allSpecies)
+            foreach (Species species in neat.allSpecies.OrderByDescending(s => s.AverageFitness))
             {
                 SetText(speciesLabel, $"Species {species.speciesNumber}/{neat.allSpecies.Count}");
                 foreach (Organism organism in species.members)

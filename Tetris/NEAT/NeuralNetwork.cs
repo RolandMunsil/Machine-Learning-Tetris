@@ -28,8 +28,6 @@ namespace Tetris.NEAT
         public NonInputNode[] nonInputNodes;
         public int totalNodes;
 
-        const double ACTIVATION_NOT_CALCULATED = Double.NaN;
-
         public NeuralNetwork(Genome genome)
         {
             numInputs = genome.numInputs;
@@ -115,30 +113,40 @@ namespace Tetris.NEAT
         public double[] FeedForward(double[] inputs)
         {
             //Activations are in the order (inputs, outputs, hidden nodes)
-            double[] activations = Enumerable.Repeat(ACTIVATION_NOT_CALCULATED, totalNodes).ToArray();
+            double[] activations = Enumerable.Repeat(Double.NaN, totalNodes - numInputs).ToArray();
             //Input node activations are just the inputs
-            inputs.CopyTo(activations, 0);
+            //inputs.CopyTo(activations, 0);
 
             //NOTE: nodes are already in an order such that when we get to a node,
             //all of its source activations will have been calculated.
             for(int i = 0; i < nonInputNodes.Length; i++)
             {
                 NonInputNode node = nonInputNodes[i];
+                int activationIndex = node.number - numInputs;
+                if (!Double.IsNaN(activations[activationIndex]))
+                    throw new InvalidOperationException();
+
                 // Dot product
-                activations[node.number] = ActivationFunc(
-                                              Enumerable.Zip(node.sourceNodeNums, node.sourceNodeWeights,
-                                                  (nodeIndex, weight) => activations[nodeIndex] * weight)
-                                              .Sum()
-                                           );
-                if(Double.IsNaN(activations[node.number]))
+                activations[activationIndex] = 0;
+                for (int j = 0; j < node.sourceNodeNums.Count; j++)
+                {
+                    int sourceNode = node.sourceNodeNums[j];
+                    double weight = node.sourceNodeWeights[j];
+                    if (sourceNode < numInputs)
+                        activations[activationIndex] += inputs[sourceNode] * weight;
+                    else
+                        activations[activationIndex] += activations[sourceNode - numInputs] * weight;
+                }
+                activations[activationIndex] = ActivationFunc(activations[activationIndex]);
+
+                if(Double.IsNaN(activations[activationIndex]))
                 {
                     throw new InvalidOperationException("Nodes are not in a correct order.");
                 }
             }
             //Take outputs from the end
-            double[] outputs = activations.Skip(numInputs).Take(numOutputs).ToArray();
+            double[] outputs = activations.Take(numOutputs).ToArray();
             return outputs;
-
         }
 
         public double ActivationFunc(double x)

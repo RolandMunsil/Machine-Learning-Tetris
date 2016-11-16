@@ -29,6 +29,18 @@ namespace Tetris.NEAT
             return copy;
         }
 
+        public bool GenesAreInOrder()
+        {
+            return connectionGenes.SequenceEqual(connectionGenes.OrderBy(g => g.innovationNumber));
+        }
+
+        public void InsertGene(ConnectionGene gene)
+        {
+            int insertAfterIndex = connectionGenes.FindLastIndex(g => g.innovationNumber < gene.innovationNumber);
+            connectionGenes.Insert(insertAfterIndex + 1, gene);
+            if (!GenesAreInOrder()) Debugger.Break();
+        }
+
         public bool IsInput(int node)
         {
             return node < numInputs;
@@ -63,6 +75,49 @@ namespace Tetris.NEAT
                     return true;
             }
             return true;
+        }
+
+        public static void CompatabilityParts(Genome genome1, Genome genome2, out int numDisjoint, out int numExcess, out double weightDiff, out int numMatching)
+        {
+            numDisjoint = 0;
+            numExcess = 0;
+            weightDiff = 0;
+            numMatching = 0;
+            int i1 = 0;
+            int i2 = 0;
+            while (true)
+            {
+                if (i1 == genome1.connectionGenes.Count)
+                {
+                    numExcess = genome2.connectionGenes.Count - i2;
+                    break;
+                }
+                if (i2 == genome2.connectionGenes.Count)
+                {
+                    numExcess = genome1.connectionGenes.Count - i1;
+                    break;
+                }
+
+                ConnectionGene gene1 = genome1.connectionGenes[i1];
+                ConnectionGene gene2 = genome2.connectionGenes[i2];
+                if (gene1.innovationNumber < gene2.innovationNumber)
+                {
+                    numDisjoint++;
+                    i1++;
+                }
+                else if (gene2.innovationNumber < gene1.innovationNumber)
+                {
+                    numDisjoint++;
+                    i2++;
+                }
+                else //equal
+                {
+                    numMatching++;
+                    weightDiff += Math.Abs(gene1.weight - gene2.weight);
+                    i1++;
+                    i2++;
+                }
+            }
         }
     }
 }
