@@ -6,7 +6,6 @@ using System.Text;
 
 namespace Tetris.NEAT
 {
-    [DebuggerDisplay("#{speciesNumber}: {members.Count} members w/ representative {representativeGenome}")]
     public class Species
     {
         public int speciesNumber;
@@ -14,7 +13,7 @@ namespace Tetris.NEAT
         public List<Organism> members;
 
         public int lastImprovedGeneration;
-        public double maxFitnessLastImprovedGeneration;
+        public double maxOrigFitnessLastImprovedGeneration;
 
         public Species(int number, Genome representativeGenome)
         {
@@ -23,7 +22,7 @@ namespace Tetris.NEAT
             members = new List<Organism>();
 
             lastImprovedGeneration = 0;
-            maxFitnessLastImprovedGeneration = 0;
+            maxOrigFitnessLastImprovedGeneration = 0;
         }
 
         public double AverageFitness
@@ -32,6 +31,19 @@ namespace Tetris.NEAT
             {
                 return members.Average(m => m.fitness);
             }
+        }
+
+        public double MaxFitness
+        {
+            get
+            {
+                return members.Max(m => m.fitness);
+            }
+        }
+
+        public override string ToString()
+        {
+            return $"#{speciesNumber}: {members.Count} members w/ representative {{{representativeGenome}}} and avg fitness {AverageFitness}";
         }
     }
 }

@@ -26,42 +26,47 @@ namespace Tetris.NEAT
         public int numOutputs;
         //The non-input nodes, NOT ordered by number! Ordered by calculation order.
         public NonInputNode[] nonInputNodes;
-        public int totalNodes;
+        public int maxNodeNum;
 
         public NeuralNetwork(Genome genome)
         {
             numInputs = genome.numInputs;
             numOutputs = genome.numOutputs;
-            totalNodes = genome.numInputs + genome.numOutputs + genome.numHiddenNodes;
-            List<NonInputNode> unorderedNodes = new List<NonInputNode>(genome.numOutputs + genome.numHiddenNodes);
-            for (int i = 0; i < genome.numOutputs + genome.numHiddenNodes; i++)
-            {
-                unorderedNodes.Add(new NonInputNode());
-                unorderedNodes[i].number = i + numInputs;
-            }
+            Dictionary<int, NonInputNode> nodesDict = new Dictionary<int, NonInputNode>();
 
             //Create nodes
             foreach (ConnectionGene connection in genome.connectionGenes)
             {
                 if (connection.enabled)
                 {
-                    int outNodeIndex = connection.outNodeNum - numInputs;
-                    NonInputNode outNode = unorderedNodes[outNodeIndex];
+                    if(!nodesDict.ContainsKey(connection.outNodeNum))
+                    {
+                        nodesDict[connection.outNodeNum] = new NonInputNode();
+                        nodesDict[connection.outNodeNum].number = connection.outNodeNum;
+                    }
+                    NonInputNode outNode = nodesDict[connection.outNodeNum];
 
                     outNode.sourceNodeNums.Add(connection.inNodeNum);
                     outNode.sourceNodeWeights.Add(connection.weight);
+
+                    if (connection.inNodeNum >= numInputs && !nodesDict.ContainsKey(connection.inNodeNum))
+                    {
+                        nodesDict[connection.inNodeNum] = new NonInputNode();
+                        nodesDict[connection.inNodeNum].number = connection.inNodeNum;
+                    }
                 }
             }
+            List<NonInputNode> unorderedNodes = new List<NonInputNode>(nodesDict.Values);
 
             //Recursively remove any nodes that have no inputs
-            for(int i = 0; i < unorderedNodes.Count; i++)
+            for (int i = 0; i < unorderedNodes.Count; i++)
             {
-                if(unorderedNodes[i].sourceNodeNums.Count == 0)
+                if (unorderedNodes[i].sourceNodeNums.Count == 0)
                 {
                     int num = unorderedNodes[i].number;
                     unorderedNodes.RemoveAt(i);
                     //Remove references to node
-                    foreach(NonInputNode node in unorderedNodes.Where(node => node.sourceNodeNums.Contains(num)))
+                    foreach (NonInputNode node in unorderedNodes.Where(node => node.sourceNodeNums.Contains(num)))
                     {
                         int index = node.sourceNodeNums.IndexOf(num);
                         node.sourceNodeNums.RemoveAt(index);
@@ -71,11 +76,15 @@ namespace Tetris.NEAT
                     i = -1;
                 }
             }
+            if (unorderedNodes.Count == 0)
+                maxNodeNum = numInputs + numOutputs - 1;
+            else
+                maxNodeNum = Math.Max(numInputs + numOutputs - 1, unorderedNodes.Max(node => node.number));
 
             //Order nodes using sort-of DFS
             List<NonInputNode> orderedNodeList = new List<NonInputNode>(unorderedNodes.Count);
 
-            bool[] nodesCalculated = new bool[totalNodes];
+            bool[] nodesCalculated = new bool[maxNodeNum+1];
             for (int i = 0; i < numInputs; i++)
                 nodesCalculated[i] = true;
             
@@ -115,7 +124,7 @@ namespace Tetris.NEAT
         {
             //Activations are in the order (inputs, outputs, hidden nodes)
             //double[] activations = Enumerable.Repeat(Double.NaN, totalNodes - numInputs).ToArray();
-            double[] activations = new double[totalNodes - numInputs];
+            double[] activations = new double[(maxNodeNum + 1) - numInputs];
 
             //NOTE: nodes are already in an order such that when we get to a node,
             //all of its source activations will have been calculated.

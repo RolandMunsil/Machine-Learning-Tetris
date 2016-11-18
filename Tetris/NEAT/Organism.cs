@@ -10,7 +10,6 @@ namespace Tetris.NEAT
         public NeuralNetwork neuralNet;
         public Genome genome;
 
-        public long originalFitness;
         public double fitness;
 
         public Organism(Genome genome)
@@ -20,7 +19,12 @@ namespace Tetris.NEAT
 
             this.genome = genome;
             this.neuralNet = new NeuralNetwork(genome);
-            this.originalFitness = -1;
+            this.fitness = -1;
+        }
+
+        public override string ToString()
+        {
+            return $"{{{genome}}} w/ fitness {fitness}";
         }
     }
 }

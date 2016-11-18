@@ -9,10 +9,10 @@ namespace NEATTests
     {
         private static Genome MakeGenome(params int[] innovationNums)
         {
-            Genome g = new Genome(-1, -1, -1);
+            Genome g = new Genome(-1, -1);
             foreach(int inn in innovationNums)
             {
-                g.connectionGenes.Add(new ConnectionGene(-1, -1, 1, true, inn));
+                g.AddGene(new ConnectionGene(inn, inn+1, 1, true, inn));
             }
             return g;
         }
@@ -101,6 +101,33 @@ namespace NEATTests
                 new[] {    2,    4, 5,       8,   },
                 new[] { 1, 2, 3, 4, 5, 6, 7,    9 },
                 5, 1, 3);
+        }
+
+        [TestMethod]
+        public void TestMutateAddConnection()
+        {
+            NEAT neat = new NEAT();
+            for(int numIn = 0; numIn < 10; numIn++)
+            {
+                for(int numOut = 0; numOut < 10; numOut++)
+                {
+                    Genome g = new Genome(numIn, numOut);
+                    for(int i = 0; i < numIn * numOut; i++)
+                    {
+                        neat.MutateAddConnection(g);
+                        Assert.AreEqual(i + 1, g.connectionGenes.Count);
+                    }
+                    neat.MutateAddConnection(g);
+                    Assert.AreEqual(numIn*numOut, g.connectionGenes.Count);
+                    for(int inNode = 0; inNode < numIn; inNode++)
+                    {
+                        for(int outNode = numIn; outNode < numIn + numOut; outNode++)
+                        {
+                            Assert.IsTrue(g.connectionGenes.Exists(gene => gene.inNodeNum == inNode && gene.outNodeNum == outNode));
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using Tetris;
 using Tetris.NEAT;
 using Microsoft.VisualBasic.PowerPacks;
+using System.Diagnostics;
 
 namespace Tetris
 {
@@ -261,6 +262,58 @@ namespace Tetris
 
         private void Learn()
         {
+            for (int i = 0; i < 100; i++)
+            {
+                int seed = Environment.TickCount;
+                NEAT.NEAT xorNeat = new NEAT.NEAT();
+                xorNeat.MakeGenZeroXOR();
+                xorNeat.EvalGenerationXOR();
+
+                var originalFitnesses = xorNeat.allSpecies.SelectMany(s => s.members).Select(o => o.fitness);
+                //var adjFitnesses = xorNeat.allSpecies.SelectMany(s => s.members).Select(o => o.fitness);
+                AddLineToTextBox($"Gen {xorNeat.currentGeneration}: avg orig fitness {originalFitnesses.Average()}, max {originalFitnesses.Max()}");
+                //AddLineToTextBox($"Gen {xorNeat.currentGeneration}: avg adj  fitness {adjFitnesses.Average()}, max {adjFitnesses.Max()}");
+                while (true)
+                {
+                    xorNeat.MakeNextGeneration();
+                    xorNeat.EvalGenerationXOR();
+
+                    originalFitnesses = xorNeat.allSpecies.SelectMany(s => s.members).Select(o => o.fitness);
+                    //adjFitnesses = xorNeat.allSpecies.SelectMany(s => s.members).Select(o => o.fitness);
+                    AddLineToTextBox($"Gen {xorNeat.currentGeneration}: avg orig fitness {originalFitnesses.Average()}, max {originalFitnesses.Max()}");
+                    //AddLineToTextBox($"Gen {xorNeat.currentGeneration}: avg adj  fitness {adjFitnesses.Average()}, max {adjFitnesses.Max()}");
+                    AddLineToTextBox($"    Mutated organisms: {xorNeat.genCreationInfo.organismsCreatedFromMutation + xorNeat.genCreationInfo.organismsCreatedFromMatingAndMutation}");
+                    AddLineToTextBox($"    Node mutations: {xorNeat.genCreationInfo.nodeMutationsDone}");
+                    double percentConnectionMutationsSucceeded = 100 * xorNeat.genCreationInfo.connectionMutationsDone / (double)xorNeat.genCreationInfo.connectionMutationsAttempted;
+                    AddLineToTextBox($"    Connection mutations: {xorNeat.genCreationInfo.connectionMutationsDone} ({xorNeat.genCreationInfo.connectionMutationsAttempted} attempted)");
+                    AddLineToTextBox($"    Species created: {xorNeat.genCreationInfo.newSpeciesCreated.Count}");
+                    AddLineToTextBox($"    Species removed: {xorNeat.genCreationInfo.speciesRemovedBecauseStagnation.Count}+{xorNeat.genCreationInfo.speciesRemovedBecauseNoMembers.Count}");
+                    String speciesStr = "[" + String.Join("][", xorNeat.allSpecies.Select(s => s.members.Count)) + "]";
+                    AddLineToTextBox($"    {xorNeat.allSpecies.Count} species: {speciesStr}");
+                    Thread.Sleep(10);
+                    bool solutionFound = false;
+                    foreach (Organism o in xorNeat.allSpecies.SelectMany(s => s.members))
+                    {
+                        solutionFound =
+                            o.neuralNet.FeedForward(new[] { 1.0, 1.0, 1.0 })[0] < 0.5 &&
+                            o.neuralNet.FeedForward(new[] { 1.0, 0.0, 1.0 })[0] >= 0.5 &&
+                            o.neuralNet.FeedForward(new[] { 0.0, 1.0, 1.0 })[0] >= 0.5 &&
+                            o.neuralNet.FeedForward(new[] { 0.0, 0.0, 1.0 })[0] < 0.5;
+                        if (solutionFound)
+                        {
+                            AddLineToTextBox($"!!! Found solution @ gen {xorNeat.currentGeneration} !!!");
+                            Thread.Sleep(500);
+                            //Debugger.Break();
+                            break;
+                        }
+                    }
+                    if (solutionFound)
+                        break;
+                }
+            }
+
+            return;
+
             NEAT.NEAT neat = new NEAT.NEAT();
             neat.MakeGenerationZero();
             neat.EvaluateGeneration();
@@ -278,7 +331,7 @@ namespace Tetris
                 foreach (Organism organism in species.members)
                 {
                     SetText(organismLabel, $"Organism {species.members.IndexOf(organism) + 1}/{species.members.Count}");
-                    SetText(fitnessLabel, $"Original fitness: {organism.originalFitness}");
+                    SetText(fitnessLabel, $"Original fitness: {organism.fitness}");
 
                     this.Invoke(new Action<Genome>(DrawNeuralNet), organism.genome);
 
@@ -305,6 +358,11 @@ namespace Tetris
             label.Invoke(new Action(() => label.Text = text));
         }
 
+        private void AddLineToTextBox(String str)
+        {
+            textBox1.Invoke(new Action(() => textBox1.AppendText(str + "\r\n")));
+        }
+
         private void DrawNeuralNet(Genome genome)
         {
             while (lineContainer.Shapes.Count > 0)
@@ -312,54 +370,54 @@ namespace Tetris
                 lineContainer.Shapes.RemoveAt(0);
             }
             
-            foreach (ConnectionGene connection in genome.connectionGenes.Where(gene => gene.enabled))
-            {
-                LineShape line = new LineShape();
-                line.Parent = lineContainer;
-                int inNode = connection.inNodeNum;
-                if (genome.IsInput(inNode))
-                {
-                    if (inNode == numberOfRows * numberOfColumns)
-                    {
-                        line.StartPoint = new Point(numberOfColumns * squareDimensions / 2, numberOfRows * (squareDimensions + 2));
-                        line.BorderColor = Color.Blue;
-                    }
-                    else
-                        line.StartPoint = Center(squares[inNode / numberOfColumns, inNode % numberOfColumns]);
-                }
-                else if (genome.IsHidden(inNode))
-                {
-                    line.StartPoint = new Point(450, 450);
-                }
+            //foreach (ConnectionGene connection in genome.connectionGenes.Where(gene => gene.enabled))
+            //{
+            //    LineShape line = new LineShape();
+            //    line.Parent = lineContainer;
+            //    int inNode = connection.inNodeNum;
+            //    if (genome.IsInput(inNode))
+            //    {
+            //        if (inNode == numberOfRows * numberOfColumns)
+            //        {
+            //            line.StartPoint = new Point(numberOfColumns * squareDimensions / 2, numberOfRows * (squareDimensions + 2));
+            //            line.BorderColor = Color.Blue;
+            //        }
+            //        else
+            //            line.StartPoint = Center(squares[inNode / numberOfColumns, inNode % numberOfColumns]);
+            //    }
+            //    else if (genome.IsHidden(inNode))
+            //    {
+            //        line.StartPoint = new Point(450, 450);
+            //    }
 
-                int outNode = connection.outNodeNum;
-                if (genome.IsOutput(outNode))
-                {
-                    int outMovement = outNode - genome.numInputs;
-                    switch (outMovement)
-                    {
-                        case 0:
-                            line.EndPoint = new Point(leftOutputLabel.Left, Center(leftOutputLabel).Y);
-                            break;
-                        case 1:
-                            line.EndPoint = new Point(rightOutputLabel.Left, Center(rightOutputLabel).Y);
-                            break;
-                        case 2:
-                            line.EndPoint = new Point(downOutputLabel.Left, Center(downOutputLabel).Y);
-                            break;
-                        case 3:
-                            line.EndPoint = new Point(rotateOutputLabel.Left, Center(rotateOutputLabel).Y);
-                            break;
-                    }
+            //    int outNode = connection.outNodeNum;
+            //    if (genome.IsOutput(outNode))
+            //    {
+            //        int outMovement = outNode - genome.numInputs;
+            //        switch (outMovement)
+            //        {
+            //            case 0:
+            //                line.EndPoint = new Point(leftOutputLabel.Left, Center(leftOutputLabel).Y);
+            //                break;
+            //            case 1:
+            //                line.EndPoint = new Point(rightOutputLabel.Left, Center(rightOutputLabel).Y);
+            //                break;
+            //            case 2:
+            //                line.EndPoint = new Point(downOutputLabel.Left, Center(downOutputLabel).Y);
+            //                break;
+            //            case 3:
+            //                line.EndPoint = new Point(rotateOutputLabel.Left, Center(rotateOutputLabel).Y);
+            //                break;
+            //        }
 
-                }
-                else if (genome.IsHidden(outNode))
-                {
-                    line.EndPoint = new Point(450, 450);
-                }
-                line.BorderColor = connection.weight > 0 ? Color.Green : Color.Red;
-                line.BorderWidth = 3;
-            }
+            //    }
+            //    else if (genome.IsHidden(outNode))
+            //    {
+            //        line.EndPoint = new Point(450, 450);
+            //    }
+            //    line.BorderColor = connection.weight > 0 ? Color.Green : Color.Red;
+            //    line.BorderWidth = 3;
+            //}
             lineContainer.Parent.Refresh();
         }
 

@@ -6,7 +6,6 @@ using System.Text;
 
 namespace Tetris.NEAT
 {
-    [DebuggerDisplay("{inNodeNum}->{outNodeNum} with weight {weight} (inn {innovationNumber}) [enabled={enabled}]")]
     public struct ConnectionGene
     {
         //NOTE: node numbers are created assuming the nodes are in the order (input nodes, output nodes, hidden nodes)
@@ -23,6 +22,11 @@ namespace Tetris.NEAT
             this.weight = weight;
             this.enabled = enabled;
             this.innovationNumber = innovationNumber;
+        }
+
+        public override string ToString()
+        {
+            return (enabled ? "" : "[DISABLED] ") + $"{inNodeNum}->{outNodeNum} with weight {weight} (inn {innovationNumber})";
         }
     }
 }

@@ -6,25 +6,34 @@ using System.Text;
 
 namespace Tetris.NEAT
 {
-    [DebuggerDisplay("{numInputs} inputs, {numHiddenNodes} hidden, {numOutputs} outputs. {connectionGenes.Count} connections")]
     public class Genome
     {
         public int numInputs;
         public int numOutputs;
-        public int numHiddenNodes;
+        //public int numHiddenNodes;
+        private HashSet<int> hiddenNodes;
         public List<ConnectionGene> connectionGenes;
 
-        public Genome(int numInputs, int numOutputs, int numHiddenNodes)
+        public Genome(int numInputs, int numOutputs, IEnumerable<int> hiddenNodes)
         {
             this.numInputs = numInputs;
             this.numOutputs = numOutputs;
-            this.numHiddenNodes = numHiddenNodes;
-            connectionGenes = new List<ConnectionGene>();
+            this.hiddenNodes = new HashSet<int>(hiddenNodes);
+            this.connectionGenes = new List<ConnectionGene>();
+        }
+
+        //A Genome with no hidden nodes
+        public Genome(int numInputs, int numOutputs)
+        {
+            this.numInputs = numInputs;
+            this.numOutputs = numOutputs;
+            this.hiddenNodes = new HashSet<int>();
+            this.connectionGenes = new List<ConnectionGene>();
         }
 
         public Genome Clone()
         {
-            Genome copy = new Genome(numInputs, numOutputs, numHiddenNodes);
+            Genome copy = new Genome(numInputs, numOutputs, hiddenNodes);
             copy.connectionGenes.AddRange(connectionGenes);
             return copy;
         }
@@ -34,11 +43,56 @@ namespace Tetris.NEAT
             return connectionGenes.SequenceEqual(connectionGenes.OrderBy(g => g.innovationNumber));
         }
 
-        public void InsertGene(ConnectionGene gene)
+        public void CheckConnectionsMatchHiddenNodes()
         {
-            int insertAfterIndex = connectionGenes.FindLastIndex(g => g.innovationNumber < gene.innovationNumber);
-            connectionGenes.Insert(insertAfterIndex + 1, gene);
-            if (!GenesAreInOrder()) Debugger.Break();
+            List<int> allReferencedNodes = connectionGenes.SelectMany(g => new[] { g.inNodeNum, g.outNodeNum }).Distinct().ToList();
+            foreach(int node in allReferencedNodes)
+            {
+                if(node >= numInputs + numOutputs && !hiddenNodes.Contains(node))
+                {
+                    throw new Exception("A hidden node is referenced that is not in hiddenNodes!");
+                }
+            }
+            foreach(int node in hiddenNodes)
+            {
+                if(!allReferencedNodes.Contains(node))
+                {
+                    throw new Exception("There is a node that has no references!");
+                }
+            }
+        }
+
+        public void AddGene(ConnectionGene gene)
+        {
+            if(IsHidden(gene.inNodeNum))
+                hiddenNodes.Add(gene.inNodeNum);
+            if (IsHidden(gene.outNodeNum))
+                hiddenNodes.Add(gene.outNodeNum);
+
+            if (NodeDependsOn(gene.inNodeNum, gene.outNodeNum))
+                Debugger.Break();
+
+            if (connectionGenes.Count == 0 ||
+                gene.innovationNumber > connectionGenes[connectionGenes.Count - 1].innovationNumber)
+            {
+                connectionGenes.Add(gene);
+            }
+            else
+            {
+                int insertAfterIndex = connectionGenes.FindLastIndex(g => g.innovationNumber < gene.innovationNumber);
+                connectionGenes.Insert(insertAfterIndex + 1, gene);
+            }
+            if (!GenesAreInOrder()) throw new Exception("Genes are not in order");
+            CheckConnectionsMatchHiddenNodes();
+            if (connectionGenes.GroupBy(g => g.innovationNumber).Count() != connectionGenes.Count)
+                throw new Exception("There are duplicate gene innovation numbers");
+            if (connectionGenes.GroupBy(g => new Tuple<int, int>(g.inNodeNum, g.outNodeNum)).Count() != connectionGenes.Count)
+                throw new Exception("There are duplicate gene connections");
+        }
+
+        public IEnumerable<int> HiddenNodes()
+        {
+            return hiddenNodes;
         }
 
         public bool IsInput(int node)
@@ -74,7 +128,7 @@ namespace Tetris.NEAT
                 if (inputTo == possibleDependNode || NodeDependsOn(inputTo, possibleDependNode))
                     return true;
             }
-            return true;
+            return false;
         }
 
         public static void CompatabilityParts(Genome genome1, Genome genome2, out int numDisjoint, out int numExcess, out double weightDiff, out int numMatching)
@@ -118,6 +172,11 @@ namespace Tetris.NEAT
                     i2++;
                 }
             }
+        }
+
+        public override string ToString()
+        {
+            return $"{numInputs} in, {numOutputs} out, {hiddenNodes.Count} hidden nodes, {connectionGenes.Count(g => g.enabled)}/{connectionGenes.Count} enabled connections";
         }
     }
 }
