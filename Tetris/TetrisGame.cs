@@ -302,7 +302,7 @@ namespace Tetris
                         if (solutionFound)
                         {
                             AddLineToTextBox($"!!! Found solution @ gen {xorNeat.currentGeneration} !!!");
-                            Thread.Sleep(500);
+                            Thread.Sleep(3000);
                             //Debugger.Break();
                             break;
                         }

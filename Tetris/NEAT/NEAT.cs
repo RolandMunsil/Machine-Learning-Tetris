@@ -194,13 +194,13 @@ namespace Tetris.NEAT
 
         void MutateAddNode(Genome genome)
         {
-            //Pick a random enabled connection
+            //Pick a random enabled connection that is not the bias
             int geneIndex;
             do
             {
                 geneIndex = rand.Next(genome.connectionGenes.Count);
             }
-            while (genome.connectionGenes[geneIndex].enabled == false);
+            while (genome.connectionGenes[geneIndex].enabled == false || genome.connectionGenes[geneIndex].inNodeNum == genome.numInputs - 1);
 
             ConnectionGene toSplit = genome.connectionGenes[geneIndex];
             genome.connectionGenes[geneIndex] = new ConnectionGene(toSplit.inNodeNum, toSplit.outNodeNum, toSplit.weight, false, toSplit.innovationNumber);
@@ -225,6 +225,9 @@ namespace Tetris.NEAT
 
         public void MutateAddConnection(Genome genome)
         {
+            if (genome.HiddenNodes().Count() > 0)
+                Debugger.Break();
+
             genCreationInfo.connectionMutationsAttempted++;
 
             List<Tuple<int, int>> possibleConnections = new List<Tuple<int, int>>();
@@ -251,11 +254,26 @@ namespace Tetris.NEAT
                     continue;
                 }
 
-                //Don't allow recreation of an existing connection
+                //Check if there's already a gene with the same connection. If it's disabled, replace it with a new gene.
+                //Otherwise try another connection
                 if (genome.connectionGenes.Exists(gene => gene.inNodeNum == inNode && gene.outNodeNum == outNode))
                 {
-                    possibleConnections.RemoveAt(index);
-                    continue;
+                    int geneIndex = genome.connectionGenes.FindIndex(gene => gene.inNodeNum == inNode && gene.outNodeNum == outNode);
+                    ConnectionGene theGene = genome.connectionGenes[geneIndex];
+                    if (!theGene.enabled)
+                    {
+                        genome.connectionGenes.RemoveAt(geneIndex);
+                        workingConnection = possibleConnections[index];
+                        break;
+                        //genome.connectionGenes[geneIndex] = new ConnectionGene(inNode, outNode, randNorm.Sample(), true, theGene.innovationNumber);
+                        //genCreationInfo.connectionMutationsDone++;
+                        //break;
+                    }
+                    else
+                    {
+                        possibleConnections.RemoveAt(index);
+                        continue;
+                    }
                 }
 
                 //Don't allow loops - check if inNode depends on outNode
@@ -341,6 +359,12 @@ namespace Tetris.NEAT
                 weightMutationsDone = 0,
                 totalInnovationsCreated = 0,
             };
+
+            foreach(Species species in allSpecies)
+            {
+                if (species.MaxFitness > 9)
+                    Debugger.Break();
+            }
 
             for(int i = 0; i < allSpecies.Count; i++)
             {
