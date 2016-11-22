@@ -21,5 +21,10 @@ namespace Tetris
             this.row = row;
             this.col = col;
         }
+
+        public Coordinate Clone()
+        {
+            return new Coordinate(this.row, this.col);
+        }
     }
 }

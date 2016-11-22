@@ -77,6 +77,7 @@
     <Compile Include="NEAT\NeuralNetwork.cs" />
     <Compile Include="NEAT\Organism.cs" />
     <Compile Include="NEAT\Species.cs" />
+    <Compile Include="RulesBasedPlayer.cs" />
     <Compile Include="Square.cs">
       <SubType>UserControl</SubType>
     </Compile>

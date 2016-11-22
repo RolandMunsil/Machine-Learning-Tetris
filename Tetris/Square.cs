@@ -46,6 +46,10 @@ namespace Tetris
             {
                 this.BackColor = value;
             }
+            get
+            {
+                return this.BackColor;
+            }
         }
     }
 }

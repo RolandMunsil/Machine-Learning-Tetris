@@ -72,12 +72,12 @@ namespace Tetris
         /// <summary>
         /// The number of visible columns on the board
         /// </summary>
-        int numColumns;
+        public int numColumns;
 
         /// <summary>
         /// The number of rows on the board
         /// </summary>
-        int numRows;
+        public int numRows;
 
         public bool hasLost = false;
 
@@ -85,8 +85,18 @@ namespace Tetris
 
         public double this[int row, int col]
         {
-            get { return board[row * numColumns + col]; }
-            set { board[row * numColumns + col] = value;  }
+            get
+            {
+                if (row < 0 || col < 0 || row >= numRows || col >= numColumns)
+                    throw new Exception();
+                return board[row * numColumns + col];
+            }
+            set
+            {
+                if (row < 0 || col < 0 || row >= numRows || col >= numColumns)
+                    throw new Exception();
+                board[row * numColumns + col] = value;
+            }
         }
 
         /// <summary>
@@ -188,6 +198,7 @@ namespace Tetris
                 {
                     // and overwriting the current position with the one above
                     this[row, col] = this[row - 1, col];
+                    lockedBlocksColors[row, col] = lockedBlocksColors[row - 1, col];
                 }
             }
 
@@ -207,6 +218,11 @@ namespace Tetris
             {
                 currentBlock = rotated;
             }
+        }
+
+        public bool CanRotateBlock()
+        {
+            return CanBeHere(currentBlock.RotatedClockwise());
         }
 
         /// <summary>
@@ -257,7 +273,7 @@ namespace Tetris
         /// </summary>
         /// <param name="block">The block to check</param>
         /// <returns>Whether the block is allowed to be there</returns>
-        private Boolean CanBeHere(Block block)
+        public Boolean CanBeHere(Block block)
         {
             // loop through each of the squares within the current block
             foreach (Coordinate squareCoord in block.squareCoords)
@@ -265,13 +281,13 @@ namespace Tetris
                 // check to see if there's something already here
                 Coordinate coord = block.toBoardCoordinates(squareCoord);
 
+                if (coord.col >= numColumns || coord.col < 0)
+                    return false;
+
                 if (coord.row < 0) continue;
 
-                if (coord.col >= numColumns || coord.col < 0 || 
-                    coord.row >= numRows || this[coord.row, coord.col] != EMPTY_SPACE)
-                {
+                if (coord.row >= numRows || this[coord.row, coord.col] != EMPTY_SPACE)
                     return false;
-                }
             }
 
             return true;
