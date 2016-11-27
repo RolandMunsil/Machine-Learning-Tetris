@@ -43,10 +43,8 @@ namespace Tetris.NEAT
         readonly double mateByAveragingProbability = 0.4;
         //Probability an offspring will be mutated after crossover
         readonly double mutateAfterMatingRate = 0.8;
-
+        //Probability that, if nothing is added to a mutated organism, that its' weights will be mutated
         readonly double mutateWeightsRate = 0.9;
-        readonly double mutateUniformPerturbWeightRate = 0.9; //Otherwise replace with random value
-        
         //Number of networks in the population
         readonly int populationSize = 150;
         //Maximum number of generations a species is allowed to stay the same fitness before it is removed
@@ -61,20 +59,27 @@ namespace Tetris.NEAT
         readonly int numRows = 20;
         readonly int numCols = 10;
         public readonly int movesAllowedBetweenTicks = 4;
-        long baseTicksSurvived;
+        public long baseTicksSurvived;
         readonly int numOutputs = 4;
 
         int nextSpeciesNumber = 1;
         int nextInnovationNumber = 1;
         int nextNodeNumber;
         Dictionary<Tuple<int, int>, int> connectionInnovations;
-        //TODO: should this be based on in/out nodes or innovation number?
         Dictionary<int, int> addNodeInnovations;
 
         Random rand;
         MathNet.Numerics.Distributions.Normal randNorm;
         public List<Species> allSpecies;
         public int currentGeneration;
+
+        public IEnumerable<Organism> Organisms
+        {
+            get
+            {
+                return allSpecies.SelectMany(s => s.members);
+            }
+        }
 
         public struct GenerationCreationInfo
         {
@@ -109,6 +114,7 @@ namespace Tetris.NEAT
             genCreationInfo = new GenerationCreationInfo();
         }
 
+        #region XOR Stuff
         public void MakeGenZeroXOR()
         {
             allSpecies = new List<Species>() { new Species(0, null) };
@@ -153,6 +159,7 @@ namespace Tetris.NEAT
 
             return (4 - sum) * (4 - sum);
         }
+        #endregion
 
         public void MakeGenerationZero()
         {
@@ -332,21 +339,31 @@ namespace Tetris.NEAT
 
         public void EvaluateGeneration()
         {
-            foreach(Species species in allSpecies)
+            //foreach(Species species in allSpecies)
+            Parallel.ForEach(allSpecies, delegate (Species species)
             {
                 double maxFitness = 0;
-                foreach(Organism organism in species.members)
+                //foreach(Organism organism in species.members)
+                Parallel.ForEach(species.members, delegate (Organism organism)
                 {
-                    if(organism.fitness == -1)
+                    if (organism.fitness == -1)
+                    {
                         organism.fitness = EvaluateNeuralNet(organism.neuralNet);
-                    maxFitness = Math.Max(maxFitness, organism.fitness);
+                        organism.fitness = Math.Pow((organism.fitness / baseTicksSurvived), 2) * baseTicksSurvived;
+                    }
+                    lock (species)
+                    {
+                        maxFitness = Math.Max(maxFitness, organism.fitness);
+                    }
                 }
-                if(maxFitness > species.maxOrigFitnessLastImprovedGeneration)
+                );
+                if (maxFitness > species.maxOrigFitnessLastImprovedGeneration)
                 {
                     species.lastImprovedGeneration = currentGeneration;
                     species.maxOrigFitnessLastImprovedGeneration = maxFitness;
                 }
             }
+            );
         }
 
         public bool MakeNextGeneration()
@@ -713,7 +730,7 @@ namespace Tetris.NEAT
                 board.Tick();
                 ticksSurvived++;
             }
-            //return (int)(Math.Pow((ticksSurvived / baseTicksSurvived), 2) * baseTicksSurvived);
+            //return Math.Pow((ticksSurvived / baseTicksSurvived), 2) * baseTicksSurvived;
             return ticksSurvived;
         }
 

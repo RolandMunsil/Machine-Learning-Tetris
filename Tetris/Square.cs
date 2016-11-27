@@ -14,28 +14,10 @@ namespace Tetris
     /// </summary>
     public partial class Square : UserControl
     {
-        public Square(int row, int col)
+        public Square()
         {
             InitializeComponent();
-            this.Name = "square" + row.ToString() + col.ToString();
-            this.row = row;
-            this.column = col;
         }
-
-        /// <summary>
-        /// The name of the square
-        /// </summary>
-        public new string Name { get; set; }
-
-        /// <summary>
-        /// The row that the square is on
-        /// </summary>
-        public int row { get; set; }
-
-        /// <summary>
-        /// The column that the square is in
-        /// </summary>
-        public int column { get; set; }
 
         /// <summary>
         /// The color of the square

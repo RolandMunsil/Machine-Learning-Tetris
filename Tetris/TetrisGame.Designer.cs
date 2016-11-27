@@ -60,9 +60,9 @@
             // tableLayout
             // 
             this.tableLayout.ColumnCount = 3;
-            this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 64.87303F));
-            this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 35.12696F));
-            this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 186F));
+            this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 77.3791F));
+            this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 22.6209F));
+            this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 188F));
             this.tableLayout.Controls.Add(this.learnButton, 2, 2);
             this.tableLayout.Controls.Add(this.scoreLabel, 0, 5);
             this.tableLayout.Controls.Add(this.menuStrip, 0, 0);
@@ -83,7 +83,7 @@
             this.tableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 45F));
             this.tableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 52F));
             this.tableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 81F));
-            this.tableLayout.Size = new System.Drawing.Size(1840, 806);
+            this.tableLayout.Size = new System.Drawing.Size(1471, 806);
             this.tableLayout.TabIndex = 0;
             // 
             // learnButton
@@ -91,7 +91,7 @@
             this.learnButton.AutoSize = true;
             this.tableLayout.SetColumnSpan(this.learnButton, 2);
             this.learnButton.Dock = System.Windows.Forms.DockStyle.Right;
-            this.learnButton.Location = new System.Drawing.Point(1537, 630);
+            this.learnButton.Location = new System.Drawing.Point(1168, 630);
             this.learnButton.Name = "learnButton";
             this.learnButton.Size = new System.Drawing.Size(300, 39);
             this.learnButton.TabIndex = 10;
@@ -103,7 +103,7 @@
             // 
             this.scoreLabel.AutoSize = true;
             this.scoreLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.scoreLabel.Location = new System.Drawing.Point(1077, 724);
+            this.scoreLabel.Location = new System.Drawing.Point(996, 724);
             this.scoreLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.scoreLabel.Name = "scoreLabel";
             this.scoreLabel.Size = new System.Drawing.Size(89, 29);
@@ -119,7 +119,7 @@
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
             this.menuStrip.Padding = new System.Windows.Forms.Padding(9, 3, 0, 3);
-            this.menuStrip.Size = new System.Drawing.Size(1840, 35);
+            this.menuStrip.Size = new System.Drawing.Size(1471, 35);
             this.menuStrip.TabIndex = 0;
             this.menuStrip.Text = "menuStrip";
             // 
@@ -141,10 +141,10 @@
             // 
             this.tableLayout.SetColumnSpan(this.newGameButton, 2);
             this.newGameButton.Dock = System.Windows.Forms.DockStyle.Top;
-            this.newGameButton.Location = new System.Drawing.Point(1077, 587);
+            this.newGameButton.Location = new System.Drawing.Point(996, 587);
             this.newGameButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.newGameButton.Name = "newGameButton";
-            this.newGameButton.Size = new System.Drawing.Size(759, 35);
+            this.newGameButton.Size = new System.Drawing.Size(471, 35);
             this.newGameButton.TabIndex = 3;
             this.newGameButton.Text = "New Game";
             this.newGameButton.UseVisualStyleBackColor = true;
@@ -154,7 +154,7 @@
             // 
             this.rowsClearedLabel.AutoSize = true;
             this.rowsClearedLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rowsClearedLabel.Location = new System.Drawing.Point(1077, 672);
+            this.rowsClearedLabel.Location = new System.Drawing.Point(996, 672);
             this.rowsClearedLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.rowsClearedLabel.Name = "rowsClearedLabel";
             this.rowsClearedLabel.Size = new System.Drawing.Size(85, 29);
@@ -165,7 +165,7 @@
             // 
             this.rowsCleared.AutoSize = true;
             this.rowsCleared.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rowsCleared.Location = new System.Drawing.Point(1657, 672);
+            this.rowsCleared.Location = new System.Drawing.Point(1286, 672);
             this.rowsCleared.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.rowsCleared.Name = "rowsCleared";
             this.rowsCleared.Size = new System.Drawing.Size(27, 29);
@@ -183,7 +183,7 @@
             this.gameWindow.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.gameWindow.Name = "gameWindow";
             this.tableLayout.SetRowSpan(this.gameWindow, 5);
-            this.gameWindow.Size = new System.Drawing.Size(1065, 755);
+            this.gameWindow.Size = new System.Drawing.Size(984, 755);
             this.gameWindow.TabIndex = 6;
             // 
             // rotateOutputLabel
@@ -192,7 +192,7 @@
             this.rotateOutputLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.rotateOutputLabel.Cursor = System.Windows.Forms.Cursors.Default;
             this.rotateOutputLabel.Font = new System.Drawing.Font("Arial Black", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rotateOutputLabel.Location = new System.Drawing.Point(995, 502);
+            this.rotateOutputLabel.Location = new System.Drawing.Point(900, 488);
             this.rotateOutputLabel.Name = "rotateOutputLabel";
             this.rotateOutputLabel.Size = new System.Drawing.Size(50, 50);
             this.rotateOutputLabel.TabIndex = 3;
@@ -205,7 +205,7 @@
             this.downOutputLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.downOutputLabel.Cursor = System.Windows.Forms.Cursors.Default;
             this.downOutputLabel.Font = new System.Drawing.Font("Arial Black", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.downOutputLabel.Location = new System.Drawing.Point(995, 342);
+            this.downOutputLabel.Location = new System.Drawing.Point(900, 328);
             this.downOutputLabel.Name = "downOutputLabel";
             this.downOutputLabel.Size = new System.Drawing.Size(50, 50);
             this.downOutputLabel.TabIndex = 2;
@@ -218,7 +218,7 @@
             this.rightOutputLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.rightOutputLabel.Cursor = System.Windows.Forms.Cursors.Default;
             this.rightOutputLabel.Font = new System.Drawing.Font("Arial Black", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rightOutputLabel.Location = new System.Drawing.Point(995, 192);
+            this.rightOutputLabel.Location = new System.Drawing.Point(900, 178);
             this.rightOutputLabel.Name = "rightOutputLabel";
             this.rightOutputLabel.Size = new System.Drawing.Size(50, 50);
             this.rightOutputLabel.TabIndex = 1;
@@ -231,7 +231,7 @@
             this.leftOutputLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.leftOutputLabel.Cursor = System.Windows.Forms.Cursors.Default;
             this.leftOutputLabel.Font = new System.Drawing.Font("Arial Black", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.leftOutputLabel.Location = new System.Drawing.Point(995, 44);
+            this.leftOutputLabel.Location = new System.Drawing.Point(900, 30);
             this.leftOutputLabel.Name = "leftOutputLabel";
             this.leftOutputLabel.Size = new System.Drawing.Size(50, 50);
             this.leftOutputLabel.TabIndex = 0;
@@ -247,10 +247,10 @@
             this.upcomingBlocks.Controls.Add(this.speciesLabel);
             this.upcomingBlocks.Controls.Add(this.genLabel);
             this.upcomingBlocks.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.upcomingBlocks.Location = new System.Drawing.Point(1077, 46);
+            this.upcomingBlocks.Location = new System.Drawing.Point(996, 46);
             this.upcomingBlocks.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.upcomingBlocks.Name = "upcomingBlocks";
-            this.upcomingBlocks.Size = new System.Drawing.Size(759, 531);
+            this.upcomingBlocks.Size = new System.Drawing.Size(471, 531);
             this.upcomingBlocks.TabIndex = 7;
             // 
             // textBox1
@@ -310,7 +310,7 @@
             // 
             this.score.AutoSize = true;
             this.score.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.score.Location = new System.Drawing.Point(1657, 724);
+            this.score.Location = new System.Drawing.Point(1286, 724);
             this.score.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.score.Name = "score";
             this.score.Size = new System.Drawing.Size(27, 29);
@@ -326,7 +326,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1840, 806);
+            this.ClientSize = new System.Drawing.Size(1471, 806);
             this.Controls.Add(this.tableLayout);
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip;
