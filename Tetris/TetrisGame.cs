@@ -11,6 +11,8 @@ using Tetris;
 using Tetris.NEAT;
 using Microsoft.VisualBasic.PowerPacks;
 using System.Diagnostics;
+using MathNet.Numerics.Statistics;
+using System.Threading.Tasks;
 
 namespace Tetris
 {
@@ -301,7 +303,13 @@ namespace Tetris
 
         private void Learn()
         {
-            for (int i = 0; i < 100; i++)
+            List<int> generationsFound = new List<int>();
+            List<int> hiddenNodesInSolutions = new List<int>();
+            List<int> enabledConnectionsInSolutions = new List<int>();
+            int numSolutionsFound = 0;
+
+            Parallel.For(0, 100, delegate (int i)
+            //for (int i = 0; i < 100; i++)
             {
                 int seed = Environment.TickCount;
                 NEAT.NEAT xorNeat = new NEAT.NEAT();
@@ -311,10 +319,10 @@ namespace Tetris
                 while (true)
                 {
                     bool succeeded = xorNeat.MakeNextGeneration();
-                    if(!succeeded || xorNeat.currentGeneration > 100)
+                    if (!succeeded || xorNeat.currentGeneration > 200)
                     {
                         AddLineToTextBox("FAILED to find solution.");
-                        Thread.Sleep(3000);
+                        //Thread.Sleep(1000);
                         break;
                     }
                     xorNeat.EvalGenerationXOR();
@@ -342,9 +350,17 @@ namespace Tetris
                             o.neuralNet.FeedForward(new[] { 0.0, 0.0, 1.0 })[0] < 0.5;
                         if (solutionFound)
                         {
-                            AddLineToTextBox($"!!! Found solution @ gen {xorNeat.currentGeneration} !!!");
-                            AddLineToTextBox($"Solution: {o.genome}");
-                            Thread.Sleep(5000);
+                            lock (textBox1)
+                            {
+                                AddLineToTextBox($"!!! Found solution @ gen {xorNeat.currentGeneration} !!!");
+                                AddLineToTextBox($"Solution: {o.genome}");
+                                numSolutionsFound++;
+                                generationsFound.Add(xorNeat.currentGeneration);
+                                hiddenNodesInSolutions.Add(o.genome.HiddenNodes().Count());
+                                enabledConnectionsInSolutions.Add(o.genome.connectionGenes.Count(g => g.enabled));
+                            }
+
+                            //Thread.Sleep(1000);
                             break;
                         }
                     }
@@ -352,6 +368,12 @@ namespace Tetris
                         break;
                 }
             }
+            );
+            AddLineToTextBox("");
+            AddLineToTextBox($"{numSolutionsFound}% success rate.");
+            AddLineToTextBox($"Avg gen found {generationsFound.Average()} (stdev {Statistics.StandardDeviation(generationsFound.Select(i => (double)i))}), max {generationsFound.Max()}");
+            AddLineToTextBox($"Avg hidden nodes {hiddenNodesInSolutions.Average()} (stdev {Statistics.StandardDeviation(hiddenNodesInSolutions.Select(i => (double)i))}), max {hiddenNodesInSolutions.Max()}");
+            AddLineToTextBox($"Avg enabled connections {enabledConnectionsInSolutions.Average()} (stdev {Statistics.StandardDeviation(enabledConnectionsInSolutions.Select(i => (double)i))}), max {enabledConnectionsInSolutions.Max()}");
 
             //NEAT.NEAT neat = new NEAT.NEAT();
             //neat.MakeGenerationZero();

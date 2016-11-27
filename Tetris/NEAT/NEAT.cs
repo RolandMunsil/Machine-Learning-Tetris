@@ -36,7 +36,7 @@ namespace Tetris.NEAT
         //Probability a new node gene will be added to the genome
         readonly double mutateAddNodeProbability = 0.03;
         //Probability a new connection will be added
-        readonly double mutateAddLinkProbability = 0.04;
+        readonly double mutateAddLinkProbability = 0.15;
         //Percentage of crossovers allowed to occur between parents of different species
         readonly double interspeciesMatingRate = 0.001;
         //Probability that matching genes will be averaged during crossover (otherwise they will be randomly chosen)
