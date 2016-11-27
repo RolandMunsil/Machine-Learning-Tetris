@@ -408,6 +408,8 @@ namespace Tetris.NEAT
                 }
             }
 
+            //TODO: keep top performers regardless of species?
+
             double totalAvgFitness = allSpecies.Sum(s => s.AverageFitness);
 
             double fracPartTotal = 0;
@@ -735,21 +737,23 @@ namespace Tetris.NEAT
         }
 
         internal void NetworkStep(NeuralNetwork network, Board board)
-        {           
+        {
             //Put block squares onto board
+            List<Coordinate> takeOff = new List<Coordinate>(4);
             foreach(Coordinate coord in board.currentBlock.squareCoords)
             {
                 var c = board.currentBlock.toBoardCoordinates(coord);
                 if (c.row >= 0)
+                {
+                    takeOff.Add(c);
                     board[c.row, c.col] = Board.BLOCK_SQUARES;
+                }
             } 
             double[] outputs = network.FeedForward(board.board);
             //Take them back off
-            foreach (Coordinate coord in board.currentBlock.squareCoords)
+            foreach (Coordinate coord in takeOff)
             {
-                var c = board.currentBlock.toBoardCoordinates(coord);
-                if(c.row >= 0)
-                    board[c.row, c.col] = Board.EMPTY_SPACE;
+                board[coord.row, coord.col] = Board.EMPTY_SPACE;
             }
 
             bool triedMoveLeft = outputs[0] > .5;

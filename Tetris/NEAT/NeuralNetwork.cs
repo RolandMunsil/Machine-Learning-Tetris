@@ -124,37 +124,42 @@ namespace Tetris.NEAT
         {
             //Activations are in the order (inputs, outputs, hidden nodes)
             //double[] activations = Enumerable.Repeat(Double.NaN, totalNodes - numInputs).ToArray();
-            double[] activations = new double[(maxNodeNum + 1) - numInputs];
+            //double[] activations = new double[(maxNodeNum + 1) - numInputs];
+            Dictionary<int, double> activations = new Dictionary<int, double>(nonInputNodes.Length);
 
             //NOTE: nodes are already in an order such that when we get to a node,
             //all of its source activations will have been calculated.
             for (int i = 0; i < nonInputNodes.Length; i++)
             {
                 NonInputNode node = nonInputNodes[i];
-                int activationIndex = node.number - numInputs;
                 //if (!Double.IsNaN(activations[activationIndex]))
                 //    throw new InvalidOperationException();
 
                 // Dot product
-                activations[activationIndex] = 0;
+                double dotProduct = 0;
                 for (int j = 0; j < node.sourceNodeNums.Count; j++)
                 {
                     int sourceNode = node.sourceNodeNums[j];
                     double weight = node.sourceNodeWeights[j];
                     if (sourceNode < numInputs)
-                        activations[activationIndex] += inputs[sourceNode] * weight;
+                        dotProduct += inputs[sourceNode] * weight;
                     else
-                        activations[activationIndex] += activations[sourceNode - numInputs] * weight;
+                        dotProduct += activations[sourceNode] * weight;
                 }
-                activations[activationIndex] = ActivationFunc(activations[activationIndex]);
+                activations[node.number] = ActivationFunc(dotProduct);
 
                 //if(Double.IsNaN(activations[activationIndex]))
                 //{
                 //    throw new InvalidOperationException("Nodes are not in a correct order.");
                 //}
             }
-            //Take outputs from the end
-            double[] outputs = activations.Take(numOutputs).ToArray();
+            //Take outputs
+            double[] outputs = new double[numOutputs];
+            for (int i = 0; i < numOutputs; i++)
+            {
+                //outputs[i] will be 0 if there's no value
+                activations.TryGetValue(numInputs + i, out outputs[i]);
+            }
             return outputs;
         }
 

@@ -334,7 +334,6 @@ namespace Tetris
 
             for (int i = 0; i < 200; i++)
             {
-                if (neat.currentGeneration == 26) Debugger.Break();
                 bool success = neat.MakeNextGeneration();
                 if (!success) throw new Exception();
                 neat.EvaluateGeneration();
