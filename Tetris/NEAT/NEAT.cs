@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Tetris.NEAT
 {
@@ -27,15 +28,15 @@ namespace Tetris.NEAT
         //Coefficient for average weight difference
         public readonly double c3 = 0.4;
         //Compatibility threshold
-        readonly double compatabilityThreshhold = 3.0;
+        readonly double compatabilityThreshhold = 2.2;
         //Percentage of each species allowed to reproduce
-        readonly double survivalThreshhold = 0.2;
+        readonly double survivalThreshhold = 0.1;
         //Probability that a reproduction will only result from mutation and not crossover
         readonly double mutateOnlyProbability = .25;
         //Probability a new node gene will be added to the genome
         readonly double mutateAddNodeProbability = 0.03;
         //Probability a new connection will be added
-        readonly double mutateAddLinkProbability = 0.05;
+        readonly double mutateAddLinkProbability = 0.04;
         //Percentage of crossovers allowed to occur between parents of different species
         readonly double interspeciesMatingRate = 0.001;
         //Probability that matching genes will be averaged during crossover (otherwise they will be randomly chosen)
@@ -43,7 +44,7 @@ namespace Tetris.NEAT
         //Probability an offspring will be mutated after crossover
         readonly double mutateAfterMatingRate = 0.8;
 
-        readonly double mutateWeightsRate = 0.8;
+        readonly double mutateWeightsRate = 0.9;
         readonly double mutateUniformPerturbWeightRate = 0.9; //Otherwise replace with random value
         
         //Number of networks in the population
@@ -165,20 +166,26 @@ namespace Tetris.NEAT
                 for (int c = 0; c < numConnections; c++)
                 {
                     MutateAddConnection(g);
+#if DEBUG
                     if (!g.GenesAreInOrder()) Debugger.Break();
                     g.CheckConnectionsMatchHiddenNodes();
+#endif
                 }
 
                 //Add hidden node
                 if(rand.NextDouble() < chanceOfGenZeroAddNode)
                 {
                     MutateAddNode(g);
+#if DEBUG
                     if (!g.GenesAreInOrder()) Debugger.Break();
                     g.CheckConnectionsMatchHiddenNodes();
+#endif
                 }
 
+#if DEBUG
                 if (!g.GenesAreInOrder()) Debugger.Break();
                 g.CheckConnectionsMatchHiddenNodes();
+#endif
 
                 Species newSpecies = new Species(nextSpeciesNumber++, g);
                 for(int j = 0; j < genZeroSpeciesSize; j++)
@@ -219,14 +226,15 @@ namespace Tetris.NEAT
             genome.AddGene(newGene1);
             genome.AddGene(newGene2);
             genCreationInfo.nodeMutationsDone++;
-
+#if DEBUG
             genome.CheckConnectionsMatchHiddenNodes();
+#endif
         }
 
         public void MutateAddConnection(Genome genome)
         {
-            if (genome.HiddenNodes().Count() > 0)
-                Debugger.Break();
+            //if (genome.HiddenNodes().Count() > 0)
+            //    Debugger.Break();
 
             genCreationInfo.connectionMutationsAttempted++;
 
@@ -308,8 +316,9 @@ namespace Tetris.NEAT
                 genome.AddGene(new ConnectionGene(workingConnection.Item1, workingConnection.Item2, randNorm.Sample(), true, innovationNum));
                 genCreationInfo.connectionMutationsDone++;
             }
-
+#if DEBUG
             genome.CheckConnectionsMatchHiddenNodes();
+#endif
         }
 
         double Compatability(Genome genome1, Genome genome2)
@@ -340,8 +349,14 @@ namespace Tetris.NEAT
             }
         }
 
-        public void MakeNextGeneration()
+        public bool MakeNextGeneration()
         {
+#if DEBUG
+            if(allSpecies.Count == 0 || allSpecies.Sum(s => s.members.Count) == 0)
+            {
+                throw new InvalidOperationException("There are no organisms.");
+            }
+#endif
             genCreationInfo = new GenerationCreationInfo
             {
                 speciesRemovedBecauseStagnation = new List<Species>(),
@@ -360,13 +375,13 @@ namespace Tetris.NEAT
                 totalInnovationsCreated = 0,
             };
 
-            foreach(Species species in allSpecies)
-            {
-                if (species.MaxFitness > 9)
-                    Debugger.Break();
-            }
+            //foreach (Species species in allSpecies)
+            //{
+            //    if (species.MaxFitness > 9)
+            //        Debugger.Break();
+            //}
 
-            for(int i = 0; i < allSpecies.Count; i++)
+            for (int i = 0; i < allSpecies.Count; i++)
             {
                 if(currentGeneration - allSpecies[i].lastImprovedGeneration >= maximumStagnation)
                 {
@@ -416,10 +431,6 @@ namespace Tetris.NEAT
 
                 //Only allow top performers to generate offspring
                 List<Organism> possibleParents = TopPerformers(species);
-                if(possibleParents.Exists(o => o.genome.connectionGenes.Count > 3 || o.genome.HiddenNodes().Count() > 0))
-                {
-                    //Debugger.Break();
-                }
 
                 for (int i = 0; i < numOffspring; i++)
                 {
@@ -428,9 +439,11 @@ namespace Tetris.NEAT
                     {
                         Genome parentGenome = possibleParents[rand.Next(possibleParents.Count)].genome.Clone();
                         Mutate(parentGenome);
+#if DEBUG
                         if (parentGenome.connectionGenes.Count == 0) Debugger.Break();
                         if (!parentGenome.GenesAreInOrder()) Debugger.Break();
                         parentGenome.CheckConnectionsMatchHiddenNodes();
+#endif
                         offspring.Add(new Organism(parentGenome));
                         genCreationInfo.organismsCreated++;
                         genCreationInfo.organismsCreatedFromMutation++;
@@ -464,9 +477,11 @@ namespace Tetris.NEAT
 
                         //Now do the mating
                         Genome child = Mate(o1, o2);
+#if DEBUG
                         if (child.connectionGenes.Count == 0) Debugger.Break();
                         if (!child.GenesAreInOrder()) Debugger.Break();
                         child.CheckConnectionsMatchHiddenNodes();
+#endif
 
                         if (rand.Next() < mutateAfterMatingRate)
                         {
@@ -474,8 +489,10 @@ namespace Tetris.NEAT
                             genCreationInfo.organismsCreatedFromMatingAndMutation++;
                         }
 
+#if DEBUG
                         if (!child.GenesAreInOrder()) Debugger.Break();
                         child.CheckConnectionsMatchHiddenNodes();
+#endif
 
                         offspring.Add(new Organism(child));
                         genCreationInfo.organismsCreated++;
@@ -483,26 +500,34 @@ namespace Tetris.NEAT
                 }
             }
 
+            genCreationInfo.totalInnovationsCreated = addNodeInnovations.Count + connectionInnovations.Count;
+
+            if (offspring.Count == 0)
+                return false;
+
+#if DEBUG
             if (offspring.Count != populationSize)
             {
                 Debugger.Break();
                 throw new InvalidOperationException();
             }
+#endif
 
             //Now add to existing specices
             FormSpecies(offspring);
 
-            genCreationInfo.totalInnovationsCreated = addNodeInnovations.Count + connectionInnovations.Count;
-
             addNodeInnovations.Clear();
             connectionInnovations.Clear();
             currentGeneration++;
+            return true;
         }
 
         private List<Organism> TopPerformers(Species species)
         {
+#if DEBUG
             if (species.members.OrderByDescending(o => o.fitness).Last().fitness > species.members.OrderByDescending(o => o.fitness).First().fitness)
                 throw new Exception();
+#endif
             int numOrganismsToReturn = (int)Math.Ceiling(species.members.Count * survivalThreshhold);
             return species.members.OrderByDescending(o => o.fitness).Take(numOrganismsToReturn).ToList();
         }
@@ -658,10 +683,12 @@ namespace Tetris.NEAT
                 }
             }
 
+#if DEBUG
             if (allSpecies.Exists(s => s.members.Count == 0))
                 throw new Exception();
             if (allSpecies.Sum(s => s.members.Count) != populationSize)
                 throw new Exception();
+#endif
         }
 
         //Calculate how many ticks a useless neural network will survive.

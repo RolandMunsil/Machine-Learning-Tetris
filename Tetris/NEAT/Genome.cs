@@ -68,9 +68,10 @@ namespace Tetris.NEAT
                 hiddenNodes.Add(gene.inNodeNum);
             if (IsHidden(gene.outNodeNum))
                 hiddenNodes.Add(gene.outNodeNum);
-
+#if DEBUG
             if (NodeDependsOn(gene.inNodeNum, gene.outNodeNum))
-                Debugger.Break();
+                throw new Exception("Adding this gene would create a recursive loop.");
+#endif
 
             if (connectionGenes.Count == 0 ||
                 gene.innovationNumber > connectionGenes[connectionGenes.Count - 1].innovationNumber)
@@ -82,12 +83,14 @@ namespace Tetris.NEAT
                 int insertAfterIndex = connectionGenes.FindLastIndex(g => g.innovationNumber < gene.innovationNumber);
                 connectionGenes.Insert(insertAfterIndex + 1, gene);
             }
+#if DEBUG
             if (!GenesAreInOrder()) throw new Exception("Genes are not in order");
             CheckConnectionsMatchHiddenNodes();
             if (connectionGenes.GroupBy(g => g.innovationNumber).Count() != connectionGenes.Count)
                 throw new Exception("There are duplicate gene innovation numbers");
             if (connectionGenes.GroupBy(g => new Tuple<int, int>(g.inNodeNum, g.outNodeNum)).Count() != connectionGenes.Count)
                 throw new Exception("There are duplicate gene connections");
+#endif
         }
 
         public IEnumerable<int> HiddenNodes()

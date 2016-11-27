@@ -65,6 +65,7 @@ namespace Tetris
             lineContainer.BringToFront();
             //blocksetList.DataSource = BlockLoader.names();
             showUIWhenPlaying = true;
+            learnButton_Click(null, null);
         }
 
         #region game
@@ -262,132 +263,134 @@ namespace Tetris
             */
         }
 
-        private void Learn()
-        {
-            board = new Board(20, 10, new Random());
-            RulesBasedPlayer player = new RulesBasedPlayer();
-            while (!board.hasLost)
-            {
-                for (int i = 0; i < 4; i++)
-                {
-                    //if (board.currentBlock.topLeft.row == 18)
-                    //    Debugger.Break();
-
-                    //Construct inputs
-                    switch (player.DecideMove(board))
-                    {
-                        case RulesBasedPlayer.Move.Left:
-                            board.TryMoveBlockLeft();
-                            break;
-                        case RulesBasedPlayer.Move.Right:
-                            board.TryMoveBlockRight();
-                            break;
-                        case RulesBasedPlayer.Move.Down:
-                            board.TryLowerBlock();
-                            break;
-                        case RulesBasedPlayer.Move.Rotate:
-                            board.TryRotateBlock();
-                            break;
-                    }
-                    this.Invoke(new Action(UpdateBoard));
-                    Thread.Sleep(5);
-                }
-                board.Tick();
-                this.Invoke(new Action(UpdateBoard));
-                //Thread.Sleep(1000);
-            }
-        }
-
         //private void Learn()
         //{
-        //    for (int i = 0; i < 100; i++)
+        //    board = new Board(20, 10, new Random());
+        //    RulesBasedPlayer player = new RulesBasedPlayer();
+        //    while (!board.hasLost)
         //    {
-        //        int seed = Environment.TickCount;
-        //        NEAT.NEAT xorNeat = new NEAT.NEAT();
-        //        xorNeat.MakeGenZeroXOR();
-        //        xorNeat.EvalGenerationXOR();
-
-        //        var originalFitnesses = xorNeat.allSpecies.SelectMany(s => s.members).Select(o => o.fitness);
-        //        //var adjFitnesses = xorNeat.allSpecies.SelectMany(s => s.members).Select(o => o.fitness);
-        //        AddLineToTextBox($"Gen {xorNeat.currentGeneration}: avg orig fitness {originalFitnesses.Average()}, max {originalFitnesses.Max()}");
-        //        //AddLineToTextBox($"Gen {xorNeat.currentGeneration}: avg adj  fitness {adjFitnesses.Average()}, max {adjFitnesses.Max()}");
-        //        while (true)
+        //        for (int i = 0; i < 4; i++)
         //        {
-        //            xorNeat.MakeNextGeneration();
-        //            xorNeat.EvalGenerationXOR();
+        //            //if (board.currentBlock.topLeft.row == 18)
+        //            //    Debugger.Break();
 
-        //            originalFitnesses = xorNeat.allSpecies.SelectMany(s => s.members).Select(o => o.fitness);
-        //            //adjFitnesses = xorNeat.allSpecies.SelectMany(s => s.members).Select(o => o.fitness);
-        //            AddLineToTextBox($"Gen {xorNeat.currentGeneration}: avg orig fitness {originalFitnesses.Average()}, max {originalFitnesses.Max()}");
-        //            //AddLineToTextBox($"Gen {xorNeat.currentGeneration}: avg adj  fitness {adjFitnesses.Average()}, max {adjFitnesses.Max()}");
-        //            AddLineToTextBox($"    Mutated organisms: {xorNeat.genCreationInfo.organismsCreatedFromMutation + xorNeat.genCreationInfo.organismsCreatedFromMatingAndMutation}");
-        //            AddLineToTextBox($"    Node mutations: {xorNeat.genCreationInfo.nodeMutationsDone}");
-        //            double percentConnectionMutationsSucceeded = 100 * xorNeat.genCreationInfo.connectionMutationsDone / (double)xorNeat.genCreationInfo.connectionMutationsAttempted;
-        //            AddLineToTextBox($"    Connection mutations: {xorNeat.genCreationInfo.connectionMutationsDone} ({xorNeat.genCreationInfo.connectionMutationsAttempted} attempted)");
-        //            AddLineToTextBox($"    Species created: {xorNeat.genCreationInfo.newSpeciesCreated.Count}");
-        //            AddLineToTextBox($"    Species removed: {xorNeat.genCreationInfo.speciesRemovedBecauseStagnation.Count}+{xorNeat.genCreationInfo.speciesRemovedBecauseNoMembers.Count}");
-        //            String speciesStr = "[" + String.Join("][", xorNeat.allSpecies.Select(s => s.members.Count)) + "]";
-        //            AddLineToTextBox($"    {xorNeat.allSpecies.Count} species: {speciesStr}");
-        //            Thread.Sleep(10);
-        //            bool solutionFound = false;
-        //            foreach (Organism o in xorNeat.allSpecies.SelectMany(s => s.members))
+        //            //Construct inputs
+        //            switch (player.DecideMove(board))
         //            {
-        //                solutionFound =
-        //                    o.neuralNet.FeedForward(new[] { 1.0, 1.0, 1.0 })[0] < 0.5 &&
-        //                    o.neuralNet.FeedForward(new[] { 1.0, 0.0, 1.0 })[0] >= 0.5 &&
-        //                    o.neuralNet.FeedForward(new[] { 0.0, 1.0, 1.0 })[0] >= 0.5 &&
-        //                    o.neuralNet.FeedForward(new[] { 0.0, 0.0, 1.0 })[0] < 0.5;
-        //                if (solutionFound)
-        //                {
-        //                    AddLineToTextBox($"!!! Found solution @ gen {xorNeat.currentGeneration} !!!");
-        //                    Thread.Sleep(3000);
-        //                    //Debugger.Break();
+        //                case RulesBasedPlayer.Move.Left:
+        //                    board.TryMoveBlockLeft();
         //                    break;
-        //                }
+        //                case RulesBasedPlayer.Move.Right:
+        //                    board.TryMoveBlockRight();
+        //                    break;
+        //                case RulesBasedPlayer.Move.Down:
+        //                    board.TryLowerBlock();
+        //                    break;
+        //                case RulesBasedPlayer.Move.Rotate:
+        //                    board.TryRotateBlock();
+        //                    break;
         //            }
-        //            if (solutionFound)
-        //                break;
+        //            this.Invoke(new Action(UpdateBoard));
+        //            Thread.Sleep(5);
         //        }
+        //        board.Tick();
+        //        this.Invoke(new Action(UpdateBoard));
+        //        //Thread.Sleep(1000);
         //    }
-
-        //    //NEAT.NEAT neat = new NEAT.NEAT();
-        //    //neat.MakeGenerationZero();
-        //    //neat.EvaluateGeneration();
-
-        //    ////for (int i = 0; i < 40; i++)
-        //    ////{
-        //    ////    neat.MakeNextGeneration();
-        //    ////    textBox1.Invoke(new Action(() => textBox1.AppendText($"Generation {neat.currentGeneration}\r\n")));
-        //    ////    neat.EvaluateGeneration();
-        //    ////}
-        //    //SetText(genLabel, $"Generation {neat.currentGeneration}");
-        //    //foreach (Species species in neat.allSpecies.OrderByDescending(s => s.AverageFitness))
-        //    //{
-        //    //    SetText(speciesLabel, $"Species {species.speciesNumber}/{neat.allSpecies.Count}");
-        //    //    foreach (Organism organism in species.members)
-        //    //    {
-        //    //        SetText(organismLabel, $"Organism {species.members.IndexOf(organism) + 1}/{species.members.Count}");
-        //    //        SetText(fitnessLabel, $"Original fitness: {organism.fitness}");
-
-        //    //        this.Invoke(new Action<Genome>(DrawNeuralNet), organism.genome);
-
-        //    //        board = new Board(20, 10, new Random(0));
-        //    //        while (!board.hasLost)
-        //    //        {
-        //    //            for (int i = 0; i < neat.movesAllowedBetweenTicks; i++)
-        //    //            {
-        //    //                //Construct inputs
-        //    //                neat.NetworkStep(organism.neuralNet, board);
-        //    //                this.Invoke(new Action(UpdateBoard));
-        //    //                Thread.Sleep(10);
-        //    //            }
-        //    //            board.Tick();
-        //    //            this.Invoke(new Action(UpdateBoard));
-        //    //            Thread.Sleep(10);
-        //    //        }
-        //    //    }
-        //    //}
         //}
+
+        private void Learn()
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                int seed = Environment.TickCount;
+                NEAT.NEAT xorNeat = new NEAT.NEAT();
+                xorNeat.MakeGenZeroXOR();
+                xorNeat.EvalGenerationXOR();
+
+                while (true)
+                {
+                    bool succeeded = xorNeat.MakeNextGeneration();
+                    if(!succeeded || xorNeat.currentGeneration > 100)
+                    {
+                        AddLineToTextBox("FAILED to find solution.");
+                        Thread.Sleep(3000);
+                        break;
+                    }
+                    xorNeat.EvalGenerationXOR();
+
+                    //var originalFitnesses = xorNeat.allSpecies.SelectMany(s => s.members).Select(o => o.fitness);
+                    ////adjFitnesses = xorNeat.allSpecies.SelectMany(s => s.members).Select(o => o.fitness);
+                    //AddLineToTextBox($"Gen {xorNeat.currentGeneration}: avg orig fitness {originalFitnesses.Average()}, max {originalFitnesses.Max()}");
+                    ////AddLineToTextBox($"Gen {xorNeat.currentGeneration}: avg adj  fitness {adjFitnesses.Average()}, max {adjFitnesses.Max()}");
+                    //AddLineToTextBox($"    Mutated organisms: {xorNeat.genCreationInfo.organismsCreatedFromMutation + xorNeat.genCreationInfo.organismsCreatedFromMatingAndMutation}");
+                    //AddLineToTextBox($"    Node mutations: {xorNeat.genCreationInfo.nodeMutationsDone}");
+                    //double percentConnectionMutationsSucceeded = 100 * xorNeat.genCreationInfo.connectionMutationsDone / (double)xorNeat.genCreationInfo.connectionMutationsAttempted;
+                    //AddLineToTextBox($"    Connection mutations: {xorNeat.genCreationInfo.connectionMutationsDone} ({xorNeat.genCreationInfo.connectionMutationsAttempted} attempted)");
+                    //AddLineToTextBox($"    Species created: {xorNeat.genCreationInfo.newSpeciesCreated.Count}");
+                    //AddLineToTextBox($"    Species removed: {xorNeat.genCreationInfo.speciesRemovedBecauseStagnation.Count}+{xorNeat.genCreationInfo.speciesRemovedBecauseNoMembers.Count}");
+                    //String speciesStr = "[" + String.Join("][", xorNeat.allSpecies.Select(s => s.members.Count)) + "]";
+                    //AddLineToTextBox($"    {xorNeat.allSpecies.Count} species: {speciesStr}");
+                    //Thread.Sleep(10);
+                    bool solutionFound = false;
+                    foreach (Organism o in xorNeat.allSpecies.SelectMany(s => s.members))
+                    {
+                        solutionFound =
+                            o.neuralNet.FeedForward(new[] { 1.0, 1.0, 1.0 })[0] < 0.5 &&
+                            o.neuralNet.FeedForward(new[] { 1.0, 0.0, 1.0 })[0] >= 0.5 &&
+                            o.neuralNet.FeedForward(new[] { 0.0, 1.0, 1.0 })[0] >= 0.5 &&
+                            o.neuralNet.FeedForward(new[] { 0.0, 0.0, 1.0 })[0] < 0.5;
+                        if (solutionFound)
+                        {
+                            AddLineToTextBox($"!!! Found solution @ gen {xorNeat.currentGeneration} !!!");
+                            AddLineToTextBox($"Solution: {o.genome}");
+                            Thread.Sleep(5000);
+                            break;
+                        }
+                    }
+                    if (solutionFound)
+                        break;
+                }
+            }
+
+            //NEAT.NEAT neat = new NEAT.NEAT();
+            //neat.MakeGenerationZero();
+            //neat.EvaluateGeneration();
+
+            ////for (int i = 0; i < 40; i++)
+            ////{
+            ////    neat.MakeNextGeneration();
+            ////    textBox1.Invoke(new Action(() => textBox1.AppendText($"Generation {neat.currentGeneration}\r\n")));
+            ////    neat.EvaluateGeneration();
+            ////}
+            //SetText(genLabel, $"Generation {neat.currentGeneration}");
+            //foreach (Species species in neat.allSpecies.OrderByDescending(s => s.AverageFitness))
+            //{
+            //    SetText(speciesLabel, $"Species {species.speciesNumber}/{neat.allSpecies.Count}");
+            //    foreach (Organism organism in species.members)
+            //    {
+            //        SetText(organismLabel, $"Organism {species.members.IndexOf(organism) + 1}/{species.members.Count}");
+            //        SetText(fitnessLabel, $"Original fitness: {organism.fitness}");
+
+            //        this.Invoke(new Action<Genome>(DrawNeuralNet), organism.genome);
+
+            //        board = new Board(20, 10, new Random(0));
+            //        while (!board.hasLost)
+            //        {
+            //            for (int i = 0; i < neat.movesAllowedBetweenTicks; i++)
+            //            {
+            //                //Construct inputs
+            //                neat.NetworkStep(organism.neuralNet, board);
+            //                this.Invoke(new Action(UpdateBoard));
+            //                Thread.Sleep(10);
+            //            }
+            //            board.Tick();
+            //            this.Invoke(new Action(UpdateBoard));
+            //            Thread.Sleep(10);
+            //        }
+            //    }
+            //}
+        }
 
         private void SetText(Label label, String text)
         {
