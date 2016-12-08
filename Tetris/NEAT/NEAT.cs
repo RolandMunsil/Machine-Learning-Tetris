@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Tetris.NEAT
@@ -340,22 +341,16 @@ namespace Tetris.NEAT
 
         public void EvaluateGeneration()
         {
-            //foreach(Species species in allSpecies)
-            Parallel.ForEach(allSpecies, delegate(Species species)
+            foreach(Species species in allSpecies)
             {
                 double maxFitness = 0;
                 foreach (Organism organism in species.members)
-                    //Parallel.ForEach(species.members, delegate (Organism organism)
                 {
                     if (organism.fitness == -1)
                     {
                         organism.fitness = EvaluateNeuralNet(organism.neuralNet);
-                        //organism.fitness = Math.Pow((organism.fitness / baseTicksSurvived), 2) * baseTicksSurvived;
                     }
-                    //lock (species)
-                    //{
-                        maxFitness = Math.Max(maxFitness, organism.fitness);
-                    //}
+                    maxFitness = Math.Max(maxFitness, organism.fitness);
                 }
                 //);
                 if (maxFitness > species.maxOrigFitnessLastImprovedGeneration)
@@ -364,8 +359,16 @@ namespace Tetris.NEAT
                     species.maxOrigFitnessLastImprovedGeneration = maxFitness;
                 }
             }
-            );
         }
+
+        private void EvaluateOrganism(object organism)
+        {
+            Organism o = (Organism) organism;
+            o.fitness = EvaluateNeuralNet(o.neuralNet);
+            Interlocked.Increment(ref finishedEvals);
+        }
+
+        private int finishedEvals;
 
         public bool MakeNextGeneration()
         {
@@ -409,13 +412,20 @@ namespace Tetris.NEAT
                 }
             }
 
+            if (allSpecies.Count == 0)
+                return false;
+
             //TODO: keep top performers regardless of species?
 
             double totalAvgFitness = allSpecies.Sum(s => s.AverageFitness);
 
-            double fracPartTotal = 0;
+            
 
             List<Organism> offspring = new List<Organism>();
+            finishedEvals = 0;
+            int totalEvals = 0;
+
+            double fracPartTotal = 0;
             foreach (Species species in allSpecies)
             {
                 //Calculate number of offspring to generate
@@ -451,6 +461,7 @@ namespace Tetris.NEAT
 
                 //Only allow top performers to generate offspring
                 List<Organism> possibleParents = TopPerformers(species);
+                List<ManualResetEvent> doneEvents = new List<ManualResetEvent>(numOffspring);
 
                 for (int i = 0; i < numOffspring; i++)
                 {
@@ -464,7 +475,11 @@ namespace Tetris.NEAT
                         if (!parentGenome.GenesAreInOrder()) Debugger.Break();
                         parentGenome.CheckConnectionsMatchHiddenNodes();
 #endif
-                        offspring.Add(new Organism(parentGenome));
+                        Organism newOrg = new Organism(parentGenome);
+                        offspring.Add(newOrg);
+                        totalEvals++;
+                        ThreadPool.QueueUserWorkItem(EvaluateOrganism, newOrg);
+
                         genCreationInfo.organismsCreated++;
                         genCreationInfo.organismsCreatedFromMutation++;
                     }
@@ -514,7 +529,11 @@ namespace Tetris.NEAT
                         child.CheckConnectionsMatchHiddenNodes();
 #endif
 
-                        offspring.Add(new Organism(child));
+                        Organism newOrg = new Organism(child);
+                        offspring.Add(newOrg);
+                        totalEvals++;
+                        ThreadPool.QueueUserWorkItem(EvaluateOrganism, newOrg);
+
                         genCreationInfo.organismsCreated++;
                     }
                 }
@@ -522,8 +541,7 @@ namespace Tetris.NEAT
 
             genCreationInfo.totalInnovationsCreated = addNodeInnovations.Count + connectionInnovations.Count;
 
-            if (offspring.Count == 0)
-                return false;
+            
 
 #if DEBUG
             if (offspring.Count != populationSize)
@@ -540,6 +558,24 @@ namespace Tetris.NEAT
                 compatabilityThreshhold += 0.1;
             if (allSpecies.Count < 20)
                 compatabilityThreshhold -= 0.1;
+
+            SpinWait.SpinUntil(() => totalEvals == finishedEvals);
+
+
+
+            foreach (Species species in allSpecies)
+            {
+#if DEBUG
+                if (species.members.Any(o => o.fitness == -1))
+                    Debugger.Break();
+#endif
+                    double maxFitness = species.members.Max(o => o.fitness);
+                if (maxFitness > species.maxOrigFitnessLastImprovedGeneration)
+                {
+                    species.lastImprovedGeneration = currentGeneration;
+                    species.maxOrigFitnessLastImprovedGeneration = maxFitness;
+                }
+            }
 
             addNodeInnovations.Clear();
             connectionInnovations.Clear();

@@ -336,7 +336,7 @@ namespace Tetris
             {
                 bool success = neat.MakeNextGeneration();
                 if (!success) throw new Exception();
-                neat.EvaluateGeneration();
+                //neat.EvaluateGeneration();
                 AddLineToTextBox($"Generation {neat.currentGeneration}");
                 AddLineToTextBox($"    Max fitness: {neat.Organisms.Max(o => o.fitness)}");
                 AddLineToTextBox($"    Avg fitness: {neat.Organisms.Average(o => o.fitness)}");
