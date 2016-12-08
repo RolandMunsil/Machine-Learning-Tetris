@@ -332,7 +332,7 @@ namespace Tetris
             neat.MakeGenerationZero();
             neat.EvaluateGeneration();
 
-            for (int i = 0; i < 200; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 bool success = neat.MakeNextGeneration();
                 if (!success) throw new Exception();
@@ -340,6 +340,8 @@ namespace Tetris
                 AddLineToTextBox($"Generation {neat.currentGeneration}");
                 AddLineToTextBox($"    Max fitness: {neat.Organisms.Max(o => o.fitness)}");
                 AddLineToTextBox($"    Avg fitness: {neat.Organisms.Average(o => o.fitness)}");
+                AddLineToTextBox($"    Num species: {neat.allSpecies.Count}");
+                this.Invoke(new Action<Organism>(DrawNeuralNet), neat.Organisms.OrderByDescending(o => o.fitness).First());
             }
             SetText(genLabel, $"Generation {neat.currentGeneration}");
             foreach (Species species in neat.allSpecies.OrderByDescending(s => s.MaxFitness))
@@ -452,6 +454,18 @@ namespace Tetris
                 }
             }
 
+            //Make bias node
+            Point biasNodeCenter = new Point((int)(numberOfColumns * squareDimensions / 2.0), numberOfRows * (squareDimensions + 2));
+
+            Square biasSquare = new Square();
+            biasSquare.Width = 15;
+            biasSquare.Height = 15;
+            biasSquare.Parent = gameWindow;
+            biasSquare.Top = (int)(biasNodeCenter.Y - 7.5);
+            biasSquare.Left = (int)(biasNodeCenter.X - 7.5);
+            biasSquare.Color = Color.Black;
+            netVizNodes.Add(numberOfRows * numberOfColumns, biasSquare);
+
             foreach (ConnectionGene connection in genome.connectionGenes.Where(gene => gene.enabled))
             {
                 LineShape line = new LineShape();
@@ -461,7 +475,7 @@ namespace Tetris
                 {
                     if (inNode == numberOfRows * numberOfColumns)
                     {
-                        line.StartPoint = new Point(numberOfColumns * squareDimensions / 2, numberOfRows * (squareDimensions + 2));
+                        line.StartPoint = biasNodeCenter;
                         line.BorderColor = Color.Blue;
                     }
                     else
@@ -469,6 +483,8 @@ namespace Tetris
                 }
                 else if (genome.IsHidden(inNode))
                 {
+                    if (!netVizNodes.ContainsKey(inNode))
+                        Debugger.Break();
                     line.StartPoint = Center(netVizNodes[inNode]);
                 }
 
@@ -495,10 +511,12 @@ namespace Tetris
                 }
                 else if (genome.IsHidden(outNode))
                 {
+                    if(!netVizNodes.ContainsKey(outNode))
+                        Debugger.Break();
                     line.EndPoint = Center(netVizNodes[outNode]);
                 }
                 line.BorderColor = connection.weight > 0 ? Color.Green : Color.Red;
-                line.BorderWidth = 3;
+                line.BorderWidth = 2;
             }
             foreach (Square s in netVizNodes.Values)
             {

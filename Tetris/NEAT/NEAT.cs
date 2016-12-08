@@ -26,17 +26,17 @@ namespace Tetris.NEAT
         //Coefficient for disjoint genes
         public readonly double c2 = 1;
         //Coefficient for average weight difference
-        public readonly double c3 = 0.4;
+        public readonly double c3 = 0.2;
         //Compatibility threshold
-        readonly double compatabilityThreshhold = 2.2;
+        double compatabilityThreshhold = 2.5;
         //Percentage of each species allowed to reproduce
-        readonly double survivalThreshhold = 0.1;
+        readonly double survivalThreshhold = 0.2;
         //Probability that a reproduction will only result from mutation and not crossover
         readonly double mutateOnlyProbability = .25;
         //Probability a new node gene will be added to the genome
-        readonly double mutateAddNodeProbability = 0.03;
+        readonly double mutateAddNodeProbability = 0.08;
         //Probability a new connection will be added
-        readonly double mutateAddLinkProbability = 0.15;
+        readonly double mutateAddLinkProbability = 0.40;
         //Percentage of crossovers allowed to occur between parents of different species
         readonly double interspeciesMatingRate = 0.001;
         //Probability that matching genes will be averaged during crossover (otherwise they will be randomly chosen)
@@ -44,14 +44,14 @@ namespace Tetris.NEAT
         //Probability an offspring will be mutated after crossover
         readonly double mutateAfterMatingRate = 0.8;
         //Probability that, if nothing is added to a mutated organism, that its' weights will be mutated
-        readonly double mutateWeightsRate = 0.9;
+        readonly double mutateWeightsRate = 0.1;
         //Number of networks in the population
-        readonly int populationSize = 150;
+        readonly int populationSize = 1000;
         //Maximum number of generations a species is allowed to stay the same fitness before it is removed
         readonly int maximumStagnation = 15;
 
 
-        readonly int genZeroSpeciesSize = 1;
+        readonly int genZeroSpeciesSize = 5;
         readonly int minGenZeroConnections = 2;
         readonly int maxGenZeroConnections = 4;
         readonly double chanceOfGenZeroAddNode = .1;
@@ -334,29 +334,30 @@ namespace Tetris.NEAT
             double weightDiff;
             Genome.CompatabilityParts(genome1, genome2, out numDisjoint, out numExcess, out weightDiff, out numMatching);
 
-            return c1 * numExcess + c2 * numDisjoint + c3 * (weightDiff / numMatching);
+            int n = Math.Max(genome1.connectionGenes.Count, genome2.connectionGenes.Count);
+            return (c1 * numExcess + c2 * numDisjoint) / (double)n + c3 * (weightDiff / numMatching);
         }
 
         public void EvaluateGeneration()
         {
             //foreach(Species species in allSpecies)
-            Parallel.ForEach(allSpecies, delegate (Species species)
+            Parallel.ForEach(allSpecies, delegate(Species species)
             {
                 double maxFitness = 0;
-                //foreach(Organism organism in species.members)
-                Parallel.ForEach(species.members, delegate (Organism organism)
+                foreach (Organism organism in species.members)
+                    //Parallel.ForEach(species.members, delegate (Organism organism)
                 {
                     if (organism.fitness == -1)
                     {
                         organism.fitness = EvaluateNeuralNet(organism.neuralNet);
-                        organism.fitness = Math.Pow((organism.fitness / baseTicksSurvived), 2) * baseTicksSurvived;
+                        //organism.fitness = Math.Pow((organism.fitness / baseTicksSurvived), 2) * baseTicksSurvived;
                     }
-                    lock (species)
-                    {
+                    //lock (species)
+                    //{
                         maxFitness = Math.Max(maxFitness, organism.fitness);
-                    }
+                    //}
                 }
-                );
+                //);
                 if (maxFitness > species.maxOrigFitnessLastImprovedGeneration)
                 {
                     species.lastImprovedGeneration = currentGeneration;
@@ -534,6 +535,11 @@ namespace Tetris.NEAT
 
             //Now add to existing specices
             FormSpecies(offspring);
+
+            if (allSpecies.Count > 50)
+                compatabilityThreshhold += 0.1;
+            if (allSpecies.Count < 20)
+                compatabilityThreshhold -= 0.1;
 
             addNodeInnovations.Clear();
             connectionInnovations.Clear();
