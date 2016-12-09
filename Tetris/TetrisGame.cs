@@ -326,51 +326,29 @@ namespace Tetris
         //    AddLineToTextBox($"Avg enabled connections {enabledConnectionsInSolutions.Average()} (stdev {Statistics.StandardDeviation(enabledConnectionsInSolutions.Select(i => (double)i))}), max {enabledConnectionsInSolutions.Max()}");
         //}
 
+        private NEAT.NEAT neat;
+
         private void Learn()
         {
-            NEAT.NEAT neat = new NEAT.NEAT();
+            neat = new NEAT.NEAT();
             neat.MakeGenerationZero();
             neat.EvaluateGeneration();
 
-            for (int i = 0; i < 1000; i++)
+            while(true)
             {
-                bool success = neat.MakeNextGeneration();
-                if (!success) throw new Exception();
-                //neat.EvaluateGeneration();
-                AddLineToTextBox($"Generation {neat.currentGeneration}");
-                AddLineToTextBox($"    Max fitness: {neat.Organisms.Max(o => o.fitness)}");
-                AddLineToTextBox($"    Avg fitness: {neat.Organisms.Average(o => o.fitness)}");
-                AddLineToTextBox($"    Num species: {neat.allSpecies.Count}");
-                this.Invoke(new Action<Organism>(DrawNeuralNet), neat.Organisms.OrderByDescending(o => o.fitness).First());
-            }
-            SetText(genLabel, $"Generation {neat.currentGeneration}");
-            foreach (Species species in neat.allSpecies.OrderByDescending(s => s.MaxFitness))
-            {
-                SetText(speciesLabel, $"Species #{species.speciesNumber} ({neat.allSpecies.Count} tot)");
-                foreach (Organism organism in species.members)
+                lock (neat)
                 {
-                    SetText(organismLabel, $"Organism {species.members.IndexOf(organism) + 1}/{species.members.Count}");
-                    long ticksSurvived = (long)(Math.Sqrt(organism.fitness / neat.baseTicksSurvived) * neat.baseTicksSurvived);
-                    SetText(fitnessLabel, $"Fitness: {organism.fitness} (ts={ticksSurvived})");
-
-                    this.Invoke(new Action<Organism>(DrawNeuralNet), organism);
-
-                    board = new Board(20, 10, new Random(0));
-                    while (!board.hasLost)
-                    {
-                        for (int i = 0; i < neat.movesAllowedBetweenTicks; i++)
-                        {
-                            //Construct inputs
-                            neat.NetworkStep(organism.neuralNet, board);
-                            this.Invoke(new Action(UpdateBoard));
-                            Thread.Sleep(10);
-                        }
-                        board.Tick();
-                        this.Invoke(new Action(UpdateBoard));
-                        Thread.Sleep(10);
-                    }
+                    bool success = neat.MakeNextGeneration();
+                    if (!success) throw new Exception();
+                    //neat.EvaluateGeneration();
+                    AddLineToTextBox($"Generation {neat.currentGeneration}");
+                    AddLineToTextBox($"    Max fitness: {neat.Organisms.Max(o => o.fitness)}");
+                    AddLineToTextBox($"    Avg fitness: {neat.Organisms.Average(o => o.fitness)}");
+                    AddLineToTextBox($"    Num species: {neat.allSpecies.Count}");
+                    this.Invoke(new Action<Organism>(DrawNeuralNet), neat.Organisms.OrderByDescending(o => o.fitness).First());
                 }
             }
+            
         }
 
         private void SetText(Label label, String text)
@@ -532,6 +510,51 @@ namespace Tetris
             topLeft.X += c.Width / 2;
             topLeft.Y += c.Height / 2;
             return topLeft;
+        }
+
+        private void topPlayButton_Click(object sender, EventArgs e)
+        {
+            new Thread(ShowTop).Start();
+        }
+
+        private void ShowTop()
+        {
+            lock (neat)
+            {
+                SetText(genLabel, $"Generation {neat.currentGeneration}");
+                foreach (Species species in neat.allSpecies.OrderByDescending(s => s.MaxFitness))
+                {
+                    SetText(speciesLabel, $"Species #{species.speciesNumber} ({neat.allSpecies.Count} tot)");
+                    foreach (Organism organism in species.members.OrderByDescending((o => o.fitness)))
+                    {
+                        SetText(organismLabel,
+                            $"Organism {species.members.IndexOf(organism) + 1}/{species.members.Count}");
+                        long ticksSurvived =
+                            (long) (Math.Sqrt(organism.fitness/neat.baseTicksSurvived)*neat.baseTicksSurvived);
+                        SetText(fitnessLabel, $"Fitness: {organism.fitness} (ts={ticksSurvived})");
+
+                        this.Invoke(new Action<Organism>(DrawNeuralNet), organism);
+
+                        board = new Board(20, 10, new Random(0));
+                        while (!board.hasLost)
+                        {
+                            for (int i = 0; i < neat.movesAllowedBetweenTicks; i++)
+                            {
+                                //Construct inputs
+                                neat.NetworkStep(organism.neuralNet, board);
+                                this.Invoke(new Action(UpdateBoard));
+                                Thread.Sleep(10);
+                            }
+                            board.Tick();
+                            this.Invoke(new Action(UpdateBoard));
+                            Thread.Sleep(10);
+                        }
+                        board = new Board(20, 10, new Random(0));
+                        this.Invoke(new Action(UpdateBoard));
+                        return;
+                    }
+                }
+            }
         }
     }
 }
