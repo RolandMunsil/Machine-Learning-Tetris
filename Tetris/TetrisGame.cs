@@ -405,6 +405,13 @@ namespace Tetris
                     layers[maxLayer].Add(node.number);
                 }
 
+                ////TODO: add any hidden nodes that were removed when creating neural network
+                //IEnumerable<int> uselessNodes = organism.genome.HiddenNodes().Except(layers.SelectMany(list => list));
+                //foreach (int node in uselessNodes)
+                //{
+                //    organism.genome.GetInputsTo(node);
+                //}
+
                 double minLayerX = squareDimensions * numberOfColumns;
                 double maxLayerX = leftOutputLabel.Left;
                 double minNodeY = 0;
@@ -447,7 +454,7 @@ namespace Tetris
             foreach (ConnectionGene connection in genome.connectionGenes.Where(gene => gene.enabled))
             {
                 LineShape line = new LineShape();
-                line.Parent = lineContainer;
+                
                 int inNode = connection.inNodeNum;
                 if (genome.IsInput(inNode))
                 {
@@ -462,9 +469,10 @@ namespace Tetris
                 else if (genome.IsHidden(inNode))
                 {
                     if (!netVizNodes.ContainsKey(inNode))
-                        Debugger.Break();
+                        continue; //Node is useless.
                     line.StartPoint = Center(netVizNodes[inNode]);
                 }
+                
 
                 int outNode = connection.outNodeNum;
                 if (genome.IsOutput(outNode))
@@ -489,12 +497,13 @@ namespace Tetris
                 }
                 else if (genome.IsHidden(outNode))
                 {
-                    if(!netVizNodes.ContainsKey(outNode))
-                        Debugger.Break();
+                    if (!netVizNodes.ContainsKey(outNode))
+                        continue; //Node is useless.
                     line.EndPoint = Center(netVizNodes[outNode]);
                 }
                 line.BorderColor = connection.weight > 0 ? Color.Green : Color.Red;
                 line.BorderWidth = 2;
+                line.Parent = lineContainer;
             }
             foreach (Square s in netVizNodes.Values)
             {

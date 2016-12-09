@@ -31,19 +31,19 @@ namespace Tetris.NEAT
         //Compatibility threshold
         double compatabilityThreshhold = 2.5;
         //Percentage of each species allowed to reproduce
-        readonly double survivalThreshhold = 0.2;
+        readonly double survivalThreshhold = 0.3;
         //Probability that a reproduction will only result from mutation and not crossover
         readonly double mutateOnlyProbability = .25;
         //Probability a new node gene will be added to the genome
-        readonly double mutateAddNodeProbability = 0.08;
+        readonly double mutateAddNodeProbability = 0.10;
         //Probability a new connection will be added
-        readonly double mutateAddLinkProbability = 0.40;
+        readonly double mutateAddLinkProbability = 0.70;
         //Percentage of crossovers allowed to occur between parents of different species
         readonly double interspeciesMatingRate = 0.001;
         //Probability that matching genes will be averaged during crossover (otherwise they will be randomly chosen)
         readonly double mateByAveragingProbability = 0.4;
         //Probability an offspring will be mutated after crossover
-        readonly double mutateAfterMatingRate = 0.8;
+        readonly double mutateAfterMatingRate = 0.2;
         //Probability that, if nothing is added to a mutated organism, that its' weights will be mutated
         readonly double mutateWeightsRate = 0.1;
         //Number of networks in the population
@@ -769,16 +769,18 @@ namespace Tetris.NEAT
                 for(int i = 0; i < movesAllowedBetweenTicks; i++)
                 {
                     //Construct inputs
-                    NetworkStep(network, board);
+                    bool madeMove = NetworkStep(network, board);
+                    if (!madeMove)
+                        break; //We know it's going to do the same thing for the rest of the ticks.
                 }
                 board.Tick();
                 ticksSurvived++;
             }
             //return Math.Pow((ticksSurvived / baseTicksSurvived), 2) * baseTicksSurvived;
-            return ticksSurvived;
+            return ticksSurvived + (board.rowsDestroyed * 10);
         }
 
-        internal void NetworkStep(NeuralNetwork network, Board board)
+        internal bool NetworkStep(NeuralNetwork network, Board board)
         {
             //Put block squares onto board
             List<Coordinate> takeOff = new List<Coordinate>(4);
@@ -811,6 +813,9 @@ namespace Tetris.NEAT
                 board.TryRotateBlock();
             if (triedMoveDown)
                 board.TryLowerBlock();
+
+            //Return whether the neural net tried to make a move
+            return triedMoveLeft || triedMoveRight || triedMoveDown || triedRotate;
         }
 
         T RandElementOf<T>(IList<T> list)

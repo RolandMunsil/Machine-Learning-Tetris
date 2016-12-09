@@ -106,7 +106,12 @@ namespace Tetris
         {
             if (!CanLowerBlock())
             {
-                LockBlock();
+                bool visible = LockBlock();
+                if (!visible)
+                {
+                    hasLost = true;
+                    return;
+                }
                 DestroyFullRows();
                 SpawnBlock();
                 if(!CanBeHere(currentBlock))
@@ -136,8 +141,10 @@ namespace Tetris
         /// <summary>
         /// Locks the current block into position on the board
         /// </summary>
-        private void LockBlock()
+        /// <returns>Whether any blocks were locked (i.e. whether or not the block is visible)</returns>
+        private bool LockBlock()
         {
+            bool locked = false;
             // loop through each of the squares within the current block
             foreach(Coordinate squareCoord in currentBlock.squareCoords)
             {
@@ -147,8 +154,10 @@ namespace Tetris
                 {
                     lockedBlocksColors[coord.row, coord.col] = currentBlock.color;
                     this[coord.row, coord.col] = LOCKED_SQUARES;
+                    locked = true;
                 }
             }
+            return locked;
         }
 
         #region gameEvents
