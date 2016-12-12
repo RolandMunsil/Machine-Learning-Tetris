@@ -21,25 +21,32 @@ namespace Tetris
         /// </summary>
         public Coordinate[] squareCoords;
 
+        /// <summary>
+        /// The width and height of the bounding box of the block.
+        /// </summary>
         public int boundingSquareSize;
 
+        /// <summary>
+        /// The top left of the block, in board coordinates
+        /// </summary>
         public Coordinate topLeft;
 
         /// <summary>
         /// A block (tetromino) that falls down the grid
         /// </summary>
-        /// <param name="positionSpawner">The type of the block</param>
+        /// <param name="blockType">The type of the block</param>
         public Block(BlockType blockType)
         {
             squareCoords = new Coordinate[blockType.squareCoords.Length];
             Array.Copy(blockType.squareCoords, squareCoords, blockType.squareCoords.Length);
+
             boundingSquareSize = blockType.boundingSquareSize;
             color = blockType.color;
             topLeft = new Coordinate(-1, -1);
         }
 
         /// <summary>
-        /// Used to clone a block. Doesn't copy <code>squares</code>.
+        /// Used to clone a block. Doesn't copy squares.
         /// </summary>
         /// <param name="original"></param>
         private Block(Block original)
@@ -51,10 +58,10 @@ namespace Tetris
         }
 
         /// <summary>
-        /// Converts the coordinates of a square within the block to board-coodinate space
+        /// Converts a block coordinate to board-coodinate space
         /// </summary>
         /// <returns></returns>
-        public Coordinate toBoardCoordinates(Coordinate coord)
+        public Coordinate ToBoardCoordinates(Coordinate coord)
         {
             return new Coordinate(coord.row + topLeft.row, coord.col + topLeft.col);
         }

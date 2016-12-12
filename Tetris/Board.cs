@@ -12,6 +12,55 @@ namespace Tetris
     class Board
     {
         /// <summary>
+        /// A block spawner
+        /// </summary>
+        BlockSpawner blockSpawner;
+
+        /// <summary>
+        /// The number of rows that have been destroyed
+        /// </summary>
+        public int rowsDestroyed = 0;
+
+        /// <summary>
+        /// The score
+        /// </summary>
+        public int score = 0;
+
+        /// <summary>
+        /// The board that is being played on.
+        /// board[row * numColumns + col]. (0, 0) is the upper left.
+        /// </summary>
+        public double[] board;
+        public const double BLOCK_SQUARES = 1;
+        public const double EMPTY_SPACE = 0;
+        public const double LOCKED_SQUARES = -1;
+
+        /// <summary>
+        /// Separate color information so that board can just be passed into a the neural network without much preprocessing
+        /// </summary>
+        public Color[,] lockedBlocksColors;
+
+        /// <summary>
+        /// The block that is currently being played
+        /// </summary>
+        public Block currentBlock;
+
+        /// <summary>
+        /// The number of visible columns on the board
+        /// </summary>
+        public int numColumns;
+
+        /// <summary>
+        /// The number of rows on the board
+        /// </summary>
+        public int numRows;
+
+        /// <summary>
+        /// Whether the player lost the game in the last tick.
+        /// </summary>
+        public bool hasLost = false;
+
+        /// <summary>
         /// The game board for a game of Tetris
         /// </summary>
         /// <param name="noOfRows">The number of visible rows on the board</param>
@@ -34,54 +83,6 @@ namespace Tetris
 
             SpawnBlock();
         }
-
-        #region variables
-
-        /// <summary>
-        /// A block spawner to specify the blocks to spawn
-        /// </summary>
-        BlockSpawner blockSpawner;
-
-        /// <summary>
-        /// The number of rows that have been destroyed
-        /// </summary>
-        public int rowsDestroyed = 0;
-
-        /// <summary>
-        /// The score that has been obtained
-        /// </summary>
-        public int score = 0;
-
-        public const double BLOCK_SQUARES = 1;
-        public const double EMPTY_SPACE = 0;
-        public const double LOCKED_SQUARES = -1;
-
-        /// <summary>
-        /// The board that is being played on.
-        /// board[row * numColumns + col]. (0, 0) is the upper left.
-        /// </summary>
-        public double[] board;
-
-        public Color[,] lockedBlocksColors;
-
-        /// <summary>
-        /// The block that is currently being played
-        /// </summary>
-        public Block currentBlock;
-
-        /// <summary>
-        /// The number of visible columns on the board
-        /// </summary>
-        public int numColumns;
-
-        /// <summary>
-        /// The number of rows on the board
-        /// </summary>
-        public int numRows;
-
-        public bool hasLost = false;
-
-        #endregion variables
 
         public double this[int row, int col]
         {
@@ -126,8 +127,6 @@ namespace Tetris
             
         }
 
-        #region board
-
         /// <summary>
         /// Creates a new block to play with
         /// </summary>
@@ -141,14 +140,14 @@ namespace Tetris
         /// <summary>
         /// Locks the current block into position on the board
         /// </summary>
-        /// <returns>Whether any blocks were locked (i.e. whether or not the block is visible)</returns>
+        /// <returns>Whether any squares were locked (i.e. whether or not the block is visible)</returns>
         private bool LockBlock()
         {
             bool locked = false;
             // loop through each of the squares within the current block
             foreach(Coordinate squareCoord in currentBlock.squareCoords)
             {
-                Coordinate coord = currentBlock.toBoardCoordinates(squareCoord);
+                Coordinate coord = currentBlock.ToBoardCoordinates(squareCoord);
                 // lock it into position on the board
                 if (coord.row >= 0)
                 {
@@ -160,31 +159,31 @@ namespace Tetris
             return locked;
         }
 
-        #region gameEvents
-
         /// <summary>
         /// Checks each of the rows and removes it if it's full, starting at the top and moving down.
         /// </summary>
         private void DestroyFullRows()
         {
-            int rowsDestroyedStart = rowsDestroyed;
+            int rowsDestroyedThisTime = 0;
 
             for (int row = 0; row < numRows; row++)
             {
                 if (RowIsFull(row))
+                {
                     DestroyRow(row);
+                    rowsDestroyedThisTime++;
+                }
             }
 
             // give bonus points for clearing multiple rows at a time
-            score += (rowsDestroyed - rowsDestroyedStart) * (rowsDestroyed - rowsDestroyedStart);
+            score += rowsDestroyedThisTime * rowsDestroyedThisTime;
         }
 
         /// <summary>
         /// Checks to see whether the specified row is full and should be removed
         /// </summary>
-        /// <param name="rowToCheck">The row to check</param>
         /// <returns>Whether the specified row is full</returns>
-        private Boolean RowIsFull(int row)
+        private bool RowIsFull(int row)
         {
             for (int col = 0; col < numColumns; col++)
                 if (this[row, col] == EMPTY_SPACE)
@@ -196,7 +195,6 @@ namespace Tetris
         /// <summary>
         /// Removes a row from the game board and drops the remaining squares down from above
         /// </summary>
-        /// <param name="row">The row to remove</param>
         private void DestroyRow(int rowToRemove)
         {
             // start on the specified row and move up
@@ -214,11 +212,9 @@ namespace Tetris
             rowsDestroyed++;
         }
 
-        #endregion gameEvents
-
         #region Block Movement
         /// <summary>
-        /// Rotates the block 90 degrees clockwise if possible
+        /// Rotates the block clockwise if possible
         /// </summary>
         public void TryRotateBlock()
         {
@@ -237,7 +233,6 @@ namespace Tetris
         /// <summary>
         /// Lowers the current block down one row if possible
         /// </summary>
-        /// <returns>Whether the block could be lowered</returns>
         public void TryLowerBlock()
         {
             currentBlock.topLeft.row++;
@@ -275,24 +270,22 @@ namespace Tetris
             if (!CanBeHere(currentBlock))
                 currentBlock.topLeft.col--;
         }
-        #endregion blockMovement
+        #endregion
 
         /// <summary>
-        /// Checks to see whether the block is allowed to be in the specified position
+        /// Returns whether the block is in a valid position
         /// </summary>
-        /// <param name="block">The block to check</param>
-        /// <returns>Whether the block is allowed to be there</returns>
-        public Boolean CanBeHere(Block block)
+        public bool CanBeHere(Block block)
         {
-            // loop through each of the squares within the current block
+            //Loop through each of the squares within the current block
             foreach (Coordinate squareCoord in block.squareCoords)
             {
-                // check to see if there's something already here
-                Coordinate coord = block.toBoardCoordinates(squareCoord);
+                Coordinate coord = block.ToBoardCoordinates(squareCoord);
 
                 if (coord.col >= numColumns || coord.col < 0)
                     return false;
 
+                //Blocks can be above the board
                 if (coord.row < 0) continue;
 
                 if (coord.row >= numRows || this[coord.row, coord.col] != EMPTY_SPACE)
@@ -301,7 +294,5 @@ namespace Tetris
 
             return true;
         }
-
-        #endregion board
     }
 }

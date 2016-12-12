@@ -24,11 +24,6 @@ namespace Tetris
         bool playing;
 
         /// <summary>
-        /// Whether to update the UI when the board state changes
-        /// </summary>
-        bool showUIWhenPlaying;
-
-        /// <summary>
         /// The board that the game is played on
         /// </summary>
         Board board;
@@ -53,7 +48,14 @@ namespace Tetris
         /// </summary>
         Square[,] squares;
 
+        /// <summary>
+        /// Container for the connections between nodes in the visualization
+        /// </summary>
         ShapeContainer lineContainer;
+
+        /// <summary>
+        /// The hidden nodes in the visualization of the neural network
+        /// </summary>
         Dictionary<int, Square> netVizNodes;
 
         /// <summary>
@@ -66,31 +68,21 @@ namespace Tetris
             lineContainer = new ShapeContainer();
             lineContainer.Parent = gameWindow;
             lineContainer.BringToFront();
-            //blocksetList.DataSource = BlockLoader.names();
-            showUIWhenPlaying = true;
-            //learnButton_Click(null, null);
             netVizNodes = new Dictionary<int, Square>();
         }
-
-        #region game
 
         /// <summary>
         /// Resets the game
         /// </summary>
         private void ResetGame()
         {
-            if (showUIWhenPlaying)
-                CreateSquares();
+            CreateSquares();
             board = new Board(numberOfRows, numberOfColumns, new Random());
 
-            if (showUIWhenPlaying)
-                tickTimer.Enabled = true;
+            tickTimer.Enabled = true;
             playing = true;
         }
 
-        /// <summary>
-        /// Moves the current block down and 
-        /// </summary>
         private void tickTimer_Tick(object sender, EventArgs e)
         {
             board.Tick();
@@ -98,8 +90,6 @@ namespace Tetris
             rowsCleared.Text = board.rowsDestroyed.ToString();
             score.Text = board.score.ToString();
         }
-
-        #endregion game
 
         #region GUI
 
@@ -157,14 +147,13 @@ namespace Tetris
             }
 
             // then display the current block
-            Block block = board.currentBlock; // cache the block to make the code read a bit better
             foreach (Coordinate squareCoord in board.currentBlock.squareCoords)
             {
-                Coordinate coord = block.toBoardCoordinates(squareCoord);
+                Coordinate coord = board.currentBlock.ToBoardCoordinates(squareCoord);
                 if (coord.col >= 0 && coord.col < numberOfColumns
                         && coord.row >= 0 && coord.row < numberOfRows)
                 {
-                    squares[coord.row, coord.col].Color = block.color;
+                    squares[coord.row, coord.col].Color = board.currentBlock.color;
                 }
             }
 
@@ -173,7 +162,6 @@ namespace Tetris
 
         #endregion GUI
 
-        #region Input
         /// <summary>
         /// Create a new game when the 'New Game' button is clicked
         /// </summary>
@@ -187,7 +175,6 @@ namespace Tetris
         /// </summary>
         private void TetrisGame_KeyPress(object sender, KeyPressEventArgs e)
         {
-            //textBox1.Text = e.KeyChar.ToString();
             if (playing)
             {
                 switch (e.KeyChar)
@@ -208,13 +195,13 @@ namespace Tetris
                 UpdateBoard();
             }
         }
-        #endregion
 
         private void learnButton_Click(object sender, EventArgs e)
         {
             new Thread(Learn).Start();
         }
 
+        #region Other (commented out) Learn methods
         //private void Learn()
         //{
         //    board = new Board(20, 10, new Random());
@@ -325,14 +312,13 @@ namespace Tetris
         //    AddLineToTextBox($"Avg hidden nodes {hiddenNodesInSolutions.Average()} (stdev {Statistics.StandardDeviation(hiddenNodesInSolutions.Select(i => (double)i))}), max {hiddenNodesInSolutions.Max()}");
         //    AddLineToTextBox($"Avg enabled connections {enabledConnectionsInSolutions.Average()} (stdev {Statistics.StandardDeviation(enabledConnectionsInSolutions.Select(i => (double)i))}), max {enabledConnectionsInSolutions.Max()}");
         //}
+        #endregion
 
         private NEAT.NEAT neat;
-
         private void Learn()
         {
             neat = new NEAT.NEAT();
             neat.MakeGenerationZero();
-            neat.EvaluateGeneration();
 
             while(true)
             {
@@ -340,7 +326,7 @@ namespace Tetris
                 {
                     bool success = neat.MakeNextGeneration();
                     if (!success) throw new Exception();
-                    //neat.EvaluateGeneration();
+
                     AddLineToTextBox($"Generation {neat.currentGeneration}");
                     AddLineToTextBox($"    Max fitness: {neat.Organisms.Max(o => o.fitness)}");
                     AddLineToTextBox($"    Avg fitness: {neat.Organisms.Average(o => o.fitness)}");
@@ -349,11 +335,6 @@ namespace Tetris
                 }
             }
             
-        }
-
-        private void SetText(Label label, String text)
-        {
-            label.Invoke(new Action(() => label.Text = text));
         }
 
         private void AddLineToTextBox(String str)
@@ -374,7 +355,7 @@ namespace Tetris
             netVizNodes.Clear();
 
             Genome genome = organism.genome;
-            if (genome.HiddenNodes().Count() > 0)
+            if (genome.hiddenNodes.Count > 0)
             {
                 //Figure out positions of hidden layers
                 List<List<int>> layers = new List<List<int>>();
@@ -386,7 +367,7 @@ namespace Tetris
                     if (genome.IsOutput(node.number))
                         continue;
                     int maxLayer = 0;
-                    foreach(int sourceNodeNum in node.sourceNodeNums)
+                    foreach(int sourceNodeNum in node.sourceNodes)
                     {
                         if (genome.IsInput(sourceNodeNum))
                             continue;
@@ -455,7 +436,7 @@ namespace Tetris
             {
                 LineShape line = new LineShape();
                 
-                int inNode = connection.inNodeNum;
+                int inNode = connection.inNode;
                 if (genome.IsInput(inNode))
                 {
                     if (inNode == numberOfRows * numberOfColumns)
@@ -474,7 +455,7 @@ namespace Tetris
                 }
                 
 
-                int outNode = connection.outNodeNum;
+                int outNode = connection.outNode;
                 if (genome.IsOutput(outNode))
                 {
                     int outMovement = outNode - genome.numInputs;
@@ -513,6 +494,11 @@ namespace Tetris
             lineContainer.Parent.Refresh();
         }
 
+        private void SetText(Label label, String text)
+        {
+            label.Invoke(new Action(() => label.Text = text));
+        }
+
         private Point Center(Control c)
         {
             Point topLeft = c.Location;
@@ -528,41 +514,35 @@ namespace Tetris
 
         private void ShowTop()
         {
+            //Wait for a generation to be finished before visualizing the top organism playing
             lock (neat)
             {
+                Species bestSpecies = neat.allSpecies.OrderByDescending(s => s.MaxFitness).First();
+                Organism bestOrganism = bestSpecies.members.OrderByDescending(o => o.fitness).First();
+
                 SetText(genLabel, $"Generation {neat.currentGeneration}");
-                foreach (Species species in neat.allSpecies.OrderByDescending(s => s.MaxFitness))
+                SetText(speciesLabel, $"Species #{bestSpecies.speciesNumber} ({neat.allSpecies.Count} tot)");
+                SetText(organismLabel, $"Organism {bestSpecies.members.IndexOf(bestOrganism) + 1}/{bestSpecies.members.Count}");
+                SetText(fitnessLabel, $"Fitness: {bestOrganism.fitness}");
+
+                this.Invoke(new Action<Organism>(DrawNeuralNet), bestOrganism);
+
+                board = new Board(20, 10, new Random(0));
+                while (!board.hasLost)
                 {
-                    SetText(speciesLabel, $"Species #{species.speciesNumber} ({neat.allSpecies.Count} tot)");
-                    foreach (Organism organism in species.members.OrderByDescending((o => o.fitness)))
+                    for (int i = 0; i < neat.movesAllowedBetweenTicks; i++)
                     {
-                        SetText(organismLabel,
-                            $"Organism {species.members.IndexOf(organism) + 1}/{species.members.Count}");
-                        long ticksSurvived =
-                            (long) (Math.Sqrt(organism.fitness/neat.baseTicksSurvived)*neat.baseTicksSurvived);
-                        SetText(fitnessLabel, $"Fitness: {organism.fitness} (ts={ticksSurvived})");
-
-                        this.Invoke(new Action<Organism>(DrawNeuralNet), organism);
-
-                        board = new Board(20, 10, new Random(0));
-                        while (!board.hasLost)
-                        {
-                            for (int i = 0; i < neat.movesAllowedBetweenTicks; i++)
-                            {
-                                //Construct inputs
-                                neat.NetworkStep(organism.neuralNet, board);
-                                this.Invoke(new Action(UpdateBoard));
-                                Thread.Sleep(10);
-                            }
-                            board.Tick();
-                            this.Invoke(new Action(UpdateBoard));
-                            Thread.Sleep(10);
-                        }
-                        board = new Board(20, 10, new Random(0));
+                        neat.NetworkStep(bestOrganism.neuralNet, board);
                         this.Invoke(new Action(UpdateBoard));
-                        return;
+                        Thread.Sleep(10);
                     }
+                    board.Tick();
+                    this.Invoke(new Action(UpdateBoard));
+                    Thread.Sleep(10);
                 }
+                //Clear the board
+                board = new Board(20, 10, new Random(0));
+                this.Invoke(new Action(UpdateBoard));
             }
         }
     }

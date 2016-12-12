@@ -20,11 +20,10 @@ namespace NEATTests
             Assert.AreEqual(net.numInputs, 1);
             Assert.AreEqual(net.numOutputs, 1);
             Assert.AreEqual(net.nonInputNodes.Length, 1);
-            Assert.AreEqual(net.maxNodeNum, 1);
             var outputNode = net.nonInputNodes[0];
             Assert.AreEqual(outputNode.number, 1);
-            Assert.AreEqual(outputNode.sourceNodeNums.Count, 1);
-            Assert.AreEqual(outputNode.sourceNodeNums[0], 0);
+            Assert.AreEqual(outputNode.sourceNodes.Count, 1);
+            Assert.AreEqual(outputNode.sourceNodes[0], 0);
             Assert.AreEqual(outputNode.sourceNodeWeights.Count, 1);
             Assert.AreEqual(outputNode.sourceNodeWeights[0], 1);
             for (double d = -5; d <= 5; d++)
@@ -51,11 +50,10 @@ namespace NEATTests
                 Assert.AreEqual(net.numInputs, numInputs);
                 Assert.AreEqual(net.numOutputs, numInputs);
                 Assert.AreEqual(net.nonInputNodes.Length, numInputs);
-                Assert.AreEqual(net.maxNodeNum, numInputs * 2 - 1);
                 foreach (var outputNode in net.nonInputNodes)
                 {
-                    Assert.AreEqual(outputNode.sourceNodeNums.Count, 1);
-                    Assert.AreEqual(outputNode.sourceNodeNums[0], outputNode.number - numInputs);
+                    Assert.AreEqual(outputNode.sourceNodes.Count, 1);
+                    Assert.AreEqual(outputNode.sourceNodes[0], outputNode.number - numInputs);
                     Assert.AreEqual(outputNode.sourceNodeWeights.Count, 1);
                     Assert.AreEqual(outputNode.sourceNodeWeights[0], 1);
                 }
@@ -86,16 +84,15 @@ namespace NEATTests
                 Assert.AreEqual(net.numInputs, numInputs);
                 Assert.AreEqual(net.numOutputs, 1);
                 Assert.AreEqual(net.nonInputNodes.Length, 1);
-                Assert.AreEqual(net.maxNodeNum, numInputs);
 
                 var outputNode = net.nonInputNodes[0];
                 Assert.AreEqual(outputNode.number, numInputs);
-                Assert.AreEqual(outputNode.sourceNodeNums.Count, numInputs);
+                Assert.AreEqual(outputNode.sourceNodes.Count, numInputs);
                 Assert.AreEqual(outputNode.sourceNodeWeights.Count, numInputs);
                 for (int i = 0; i < numInputs; i++)
                 {
-                    Assert.IsTrue(outputNode.sourceNodeNums.Contains(i));
-                    int idx = outputNode.sourceNodeNums.IndexOf(i);
+                    Assert.IsTrue(outputNode.sourceNodes.Contains(i));
+                    int idx = outputNode.sourceNodes.IndexOf(i);
                     Assert.AreEqual(outputNode.sourceNodeWeights[idx], i + 1);
                 }
 
@@ -137,11 +134,10 @@ namespace NEATTests
                 Assert.AreEqual(net.numInputs, numInputs);
                 Assert.AreEqual(net.numOutputs, numInputs);
                 Assert.AreEqual(net.nonInputNodes.Length, numInputs);
-                Assert.AreEqual(net.maxNodeNum, numInputs * 2 - 1);
                 foreach (var outputNode in net.nonInputNodes)
                 {
-                    Assert.AreEqual(outputNode.sourceNodeNums.Count, 1);
-                    Assert.AreEqual(outputNode.sourceNodeNums[0], outputNode.number - numInputs);
+                    Assert.AreEqual(outputNode.sourceNodes.Count, 1);
+                    Assert.AreEqual(outputNode.sourceNodes[0], outputNode.number - numInputs);
                     Assert.AreEqual(outputNode.sourceNodeWeights.Count, 1);
                     Assert.AreEqual(outputNode.sourceNodeWeights[0], 1);
                 }
@@ -163,13 +159,12 @@ namespace NEATTests
             genome.AddGene(new ConnectionGene(6, 3,  1,        true, 7));
             genome.AddGene(new ConnectionGene(5, 4,  1,        true, 8));
             //};
-            Assert.AreEqual(genome.HiddenNodes().Count(), 2);
+            Assert.AreEqual(genome.hiddenNodes.Count, 2);
 
             NeuralNetwork net = new NeuralNetwork(genome);
             Assert.AreEqual(net.numInputs, 2);
             Assert.AreEqual(net.numOutputs, 3);
             Assert.AreEqual(net.nonInputNodes.Length, 5);
-            Assert.AreEqual(net.maxNodeNum, 6);
 
             Func<double, double> a = net.ActivationFunc;
 
@@ -231,7 +226,7 @@ namespace NEATTests
             {
                 genome.AddGene(new ConnectionGene(outN - 1, outN, 0, true, innov++));
             }
-            Assert.AreEqual(genome.HiddenNodes().Count(), 45+100);
+            Assert.AreEqual(genome.hiddenNodes.Count, 45+100);
 
             NeuralNetwork net = new NeuralNetwork(genome);
             Assert.AreEqual(net.numInputs, 10);

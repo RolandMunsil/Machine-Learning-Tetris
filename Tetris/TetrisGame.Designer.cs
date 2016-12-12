@@ -39,6 +39,7 @@
             this.rowsClearedLabel = new System.Windows.Forms.Label();
             this.rowsCleared = new System.Windows.Forms.Label();
             this.gameWindow = new System.Windows.Forms.Panel();
+            this.topPlayButton = new System.Windows.Forms.Button();
             this.rotateOutputLabel = new System.Windows.Forms.Label();
             this.downOutputLabel = new System.Windows.Forms.Label();
             this.rightOutputLabel = new System.Windows.Forms.Label();
@@ -51,7 +52,6 @@
             this.genLabel = new System.Windows.Forms.Label();
             this.score = new System.Windows.Forms.Label();
             this.tickTimer = new System.Windows.Forms.Timer(this.components);
-            this.topPlayButton = new System.Windows.Forms.Button();
             this.tableLayout.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.gameWindow.SuspendLayout();
@@ -63,7 +63,7 @@
             this.tableLayout.ColumnCount = 3;
             this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 77.3791F));
             this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 22.6209F));
-            this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 191F));
+            this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 192F));
             this.tableLayout.Controls.Add(this.learnButton, 2, 2);
             this.tableLayout.Controls.Add(this.scoreLabel, 0, 5);
             this.tableLayout.Controls.Add(this.menuStrip, 0, 0);
@@ -104,7 +104,7 @@
             // 
             this.scoreLabel.AutoSize = true;
             this.scoreLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.scoreLabel.Location = new System.Drawing.Point(994, 724);
+            this.scoreLabel.Location = new System.Drawing.Point(993, 724);
             this.scoreLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.scoreLabel.Name = "scoreLabel";
             this.scoreLabel.Size = new System.Drawing.Size(89, 29);
@@ -142,10 +142,10 @@
             // 
             this.tableLayout.SetColumnSpan(this.newGameButton, 2);
             this.newGameButton.Dock = System.Windows.Forms.DockStyle.Top;
-            this.newGameButton.Location = new System.Drawing.Point(994, 587);
+            this.newGameButton.Location = new System.Drawing.Point(993, 587);
             this.newGameButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.newGameButton.Name = "newGameButton";
-            this.newGameButton.Size = new System.Drawing.Size(473, 35);
+            this.newGameButton.Size = new System.Drawing.Size(474, 35);
             this.newGameButton.TabIndex = 3;
             this.newGameButton.Text = "New Game";
             this.newGameButton.UseVisualStyleBackColor = true;
@@ -155,7 +155,7 @@
             // 
             this.rowsClearedLabel.AutoSize = true;
             this.rowsClearedLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rowsClearedLabel.Location = new System.Drawing.Point(994, 672);
+            this.rowsClearedLabel.Location = new System.Drawing.Point(993, 672);
             this.rowsClearedLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.rowsClearedLabel.Name = "rowsClearedLabel";
             this.rowsClearedLabel.Size = new System.Drawing.Size(85, 29);
@@ -166,7 +166,7 @@
             // 
             this.rowsCleared.AutoSize = true;
             this.rowsCleared.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rowsCleared.Location = new System.Drawing.Point(1283, 672);
+            this.rowsCleared.Location = new System.Drawing.Point(1282, 672);
             this.rowsCleared.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.rowsCleared.Name = "rowsCleared";
             this.rowsCleared.Size = new System.Drawing.Size(27, 29);
@@ -185,8 +185,18 @@
             this.gameWindow.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.gameWindow.Name = "gameWindow";
             this.tableLayout.SetRowSpan(this.gameWindow, 5);
-            this.gameWindow.Size = new System.Drawing.Size(982, 755);
+            this.gameWindow.Size = new System.Drawing.Size(981, 755);
             this.gameWindow.TabIndex = 6;
+            // 
+            // topPlayButton
+            // 
+            this.topPlayButton.Location = new System.Drawing.Point(786, 706);
+            this.topPlayButton.Name = "topPlayButton";
+            this.topPlayButton.Size = new System.Drawing.Size(152, 42);
+            this.topPlayButton.TabIndex = 4;
+            this.topPlayButton.Text = "Have Best Play";
+            this.topPlayButton.UseVisualStyleBackColor = true;
+            this.topPlayButton.Click += new System.EventHandler(this.topPlayButton_Click);
             // 
             // rotateOutputLabel
             // 
@@ -249,10 +259,10 @@
             this.upcomingBlocks.Controls.Add(this.speciesLabel);
             this.upcomingBlocks.Controls.Add(this.genLabel);
             this.upcomingBlocks.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.upcomingBlocks.Location = new System.Drawing.Point(994, 46);
+            this.upcomingBlocks.Location = new System.Drawing.Point(993, 46);
             this.upcomingBlocks.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.upcomingBlocks.Name = "upcomingBlocks";
-            this.upcomingBlocks.Size = new System.Drawing.Size(473, 531);
+            this.upcomingBlocks.Size = new System.Drawing.Size(474, 531);
             this.upcomingBlocks.TabIndex = 7;
             // 
             // textBox1
@@ -312,7 +322,7 @@
             // 
             this.score.AutoSize = true;
             this.score.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.score.Location = new System.Drawing.Point(1283, 724);
+            this.score.Location = new System.Drawing.Point(1282, 724);
             this.score.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.score.Name = "score";
             this.score.Size = new System.Drawing.Size(27, 29);
@@ -323,16 +333,6 @@
             // 
             this.tickTimer.Interval = 500;
             this.tickTimer.Tick += new System.EventHandler(this.tickTimer_Tick);
-            // 
-            // topPlayButton
-            // 
-            this.topPlayButton.Location = new System.Drawing.Point(835, 712);
-            this.topPlayButton.Name = "topPlayButton";
-            this.topPlayButton.Size = new System.Drawing.Size(144, 36);
-            this.topPlayButton.TabIndex = 4;
-            this.topPlayButton.Text = "Have Top Play";
-            this.topPlayButton.UseVisualStyleBackColor = true;
-            this.topPlayButton.Click += new System.EventHandler(this.topPlayButton_Click);
             // 
             // TetrisGame
             // 

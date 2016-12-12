@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Tetris
 {
+    /// <summary>
+    /// Just made this for fun. Not used at all for final project.
+    /// </summary>
     class RulesBasedPlayer
     {
         public enum Move
@@ -146,7 +149,7 @@ namespace Tetris
             int numSquaresInLowestRow = 0;
             foreach (Coordinate coord in board.currentBlock.squareCoords)
             {
-                Coordinate boardCoord = board.currentBlock.toBoardCoordinates(coord);
+                Coordinate boardCoord = board.currentBlock.ToBoardCoordinates(coord);
                 if (boardCoord.row > lowestSquareRow)
                 {
                     lowestSquareRow = boardCoord.row;
@@ -163,7 +166,7 @@ namespace Tetris
             //Calc below spaces created
             foreach(Coordinate lowCoord in board.currentBlock.squareCoords.GroupBy(c => c.col).Select(g => g.OrderByDescending(c => c.row).First()))
             {
-                Coordinate below = board.currentBlock.toBoardCoordinates(new Coordinate(lowCoord.row + 1, lowCoord.col));
+                Coordinate below = board.currentBlock.ToBoardCoordinates(new Coordinate(lowCoord.row + 1, lowCoord.col));
                 while(below.row < 0 || below.row < board.numRows && board[below.row, below.col] == Board.EMPTY_SPACE)
                 {
                     endState.numEmptySquaresUnder++;

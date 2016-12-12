@@ -9,11 +9,12 @@ namespace Tetris.NEAT
     public class Species
     {
         public int speciesNumber;
+
         public Genome representativeGenome;
         public List<Organism> members;
 
         public int lastImprovedGeneration;
-        public double maxOrigFitnessLastImprovedGeneration;
+        public double maxFitnessLastImprovedGeneration;
 
         public Species(int number, Genome representativeGenome)
         {
@@ -22,7 +23,7 @@ namespace Tetris.NEAT
             members = new List<Organism>();
 
             lastImprovedGeneration = 0;
-            maxOrigFitnessLastImprovedGeneration = 0;
+            maxFitnessLastImprovedGeneration = 0;
         }
 
         public double AverageFitness

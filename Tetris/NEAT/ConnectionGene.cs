@@ -8,17 +8,16 @@ namespace Tetris.NEAT
 {
     public struct ConnectionGene
     {
-        //NOTE: node numbers are created assuming the nodes are in the order (input nodes, output nodes, hidden nodes)
-        public int inNodeNum;
-        public int outNodeNum;
+        public int inNode;
+        public int outNode;
         public double weight;
         public bool enabled;
         public int innovationNumber;
 
         public ConnectionGene(int inNodeNum, int outNodeNum, double weight, bool enabled, int innovationNumber)
         {
-            this.inNodeNum = inNodeNum;
-            this.outNodeNum = outNodeNum;
+            this.inNode = inNodeNum;
+            this.outNode = outNodeNum;
             this.weight = weight;
             this.enabled = enabled;
             this.innovationNumber = innovationNumber;
@@ -26,7 +25,7 @@ namespace Tetris.NEAT
 
         public override string ToString()
         {
-            return (enabled ? "" : "[DISABLED] ") + $"{inNodeNum}->{outNodeNum} with weight {weight} (inn {innovationNumber})";
+            return (enabled ? "" : "[DISABLED] ") + $"{inNode}->{outNode} with weight {weight} (inn {innovationNumber})";
         }
     }
 }

@@ -123,7 +123,7 @@ namespace NEATTests
                     {
                         for(int outNode = numIn; outNode < numIn + numOut; outNode++)
                         {
-                            Assert.IsTrue(g.connectionGenes.Exists(gene => gene.inNodeNum == inNode && gene.outNodeNum == outNode));
+                            Assert.IsTrue(g.connectionGenes.Exists(gene => gene.inNode == inNode && gene.outNode == outNode));
                         }
                     }
                 }
