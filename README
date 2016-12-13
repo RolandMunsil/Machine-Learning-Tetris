@@ -1,3 +1,3 @@
-Build using Visual Studio 2015.\
+Build using Visual Studio 2015.
 
 To start NEAT, click the "Learn" button. At any time you can click the "Have best play" button to show a visualization of the fittest organism of the current generation.
